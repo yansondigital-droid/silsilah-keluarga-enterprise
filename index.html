@@ -1,0 +1,3087 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Silsilah Keluarga Digital Enterprise</title>
+  
+  <meta name="theme-color" content="#0284c7">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="TrahDigital">
+  <meta name="description" content="Aplikasi Silsilah Keluarga Digital Enterprise terintegrasi Google Sheets dan Google Drive">
+
+  <!-- Embedded Web App Manifest -->
+  <link rel="manifest" href="data:application/manifest+json;utf-8,%7B%22name%22%3A%22Silsilah%20Keluarga%20Digital%20Enterprise%22%2C%22short_name%22%3A%22TrahDigital%22%2C%22description%22%3A%22Sistem%20Silsilah%20Keluarga%20Digital%20Terintegrasi%20Google%20Workspace%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f4f6fa%22%2C%22theme_color%22%3A%22%230284c7%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F3135%2F3135715.png%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%20maskable%22%7D%2C%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F3135%2F3135715.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc',
+              400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1',
+              800: '#075985', 900: '#0c4a6e', 950: '#082f49'
+            },
+            surface: {
+              light: '#f4f6fa', lightCard: '#ffffff',
+              dark: '#0a0f1d', darkCard: '#131b2e', darkBorder: '#1e293b'
+            }
+          },
+          boxShadow: {
+            'soft-flat': '5px 5px 14px rgba(160, 175, 200, 0.28), -5px -5px 14px rgba(255, 255, 255, 0.95)',
+            'soft-pressed': 'inset 3px 3px 6px rgba(160, 175, 200, 0.35), inset -3px -3px 6px rgba(255, 255, 255, 0.9)',
+            'soft-sm': '2.5px 2.5px 7px rgba(160, 175, 200, 0.22), -2.5px -2.5px 7px rgba(255, 255, 255, 0.9)',
+            'dark-flat': '5px 5px 15px rgba(0, 0, 0, 0.45), -4px -4px 12px rgba(30, 41, 59, 0.3)',
+            'dark-pressed': 'inset 3px 3px 6px rgba(0, 0, 0, 0.6), inset -2px -2px 5px rgba(30, 41, 59, 0.4)',
+            'dark-sm': '3px 3px 8px rgba(0, 0, 0, 0.4), -2px -2px 6px rgba(30, 41, 59, 0.25)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    .hidden { display: none !important; }
+    html, body {
+      overscroll-behavior-y: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    .dark ::-webkit-scrollbar-thumb { background: #334155; }
+
+    .tree-viewport-area { touch-action: none; cursor: grab; }
+    .tree-viewport-area:active { cursor: grabbing; }
+    .connector-line {
+      stroke: #0ea5e9;
+      stroke-width: 2.2px;
+      fill: none;
+      stroke-linecap: round;
+      opacity: 0.85;
+      transition: stroke 0.2s ease;
+    }
+    .dark .connector-line { stroke: #38bdf8; opacity: 0.75; }
+
+    .soft-neu {
+      background: #ffffff;
+      box-shadow: 6px 6px 16px rgba(160, 175, 200, 0.22), -6px -6px 16px rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+    .dark .soft-neu {
+      background: #131b2e;
+      box-shadow: 6px 6px 18px rgba(0, 0, 0, 0.45), -4px -4px 14px rgba(30, 41, 59, 0.35);
+      border: 1px solid rgba(30, 41, 59, 0.85);
+    }
+
+    .soft-neu-sm {
+      background: #ffffff;
+      box-shadow: 3px 3px 8px rgba(160, 175, 200, 0.2), -3px -3px 8px rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(226, 232, 240, 0.7);
+    }
+    .dark .soft-neu-sm {
+      background: #172239;
+      box-shadow: 3px 3px 9px rgba(0, 0, 0, 0.4), -2px -2px 7px rgba(30, 41, 59, 0.3);
+      border: 1px solid rgba(30, 41, 59, 0.8);
+    }
+
+    .soft-neu-inset {
+      background: #f1f5f9;
+      box-shadow: inset 2.5px 2.5px 6px rgba(160, 175, 200, 0.3), inset -2.5px -2.5px 6px rgba(255, 255, 255, 0.95);
+    }
+    .dark .soft-neu-inset {
+      background: #0b1120;
+      box-shadow: inset 3px 3px 7px rgba(0, 0, 0, 0.55), inset -2px -2px 6px rgba(30, 41, 59, 0.4);
+    }
+
+    @keyframes playfulGradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.08); opacity: 0.85; }
+    }
+    .birthday-glow { animation: pulseGlow 2.2s infinite ease-in-out; }
+
+    .animated-menu-text {
+      background: linear-gradient(90deg, #0284c7, #06b6d4, #6366f1, #db2777, #ea580c, #0284c7);
+      background-size: 300% 300%;
+      animation: playfulGradientShift 4s ease infinite;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
+    .dark .animated-menu-text {
+      background: linear-gradient(90deg, #38bdf8, #22d3ee, #a78bfa, #f472b6, #fb923c, #38bdf8);
+      background-size: 300% 300%;
+      animation: playfulGradientShift 4s ease infinite;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
+
+    .animated-dash-stat {
+      background: linear-gradient(90deg, #0ea5e9, #06b6d4, #8b5cf6, #ec4899, #0ea5e9);
+      background-size: 300% 300%;
+      animation: playfulGradientShift 3.5s linear infinite;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
+    .dark .animated-dash-stat {
+      background: linear-gradient(90deg, #38bdf8, #22d3ee, #c084fc, #f472b6, #38bdf8);
+      background-size: 300% 300%;
+      animation: playfulGradientShift 3.5s linear infinite;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
+
+    .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 14px); }
+    .pt-safe { padding-top: max(env(safe-area-inset-top), 0px); }
+
+    /* Print Formatting Rules */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 12mm 15mm 15mm 15mm;
+      }
+      html, body, #app, main, #mainScrollArea {
+        overflow: visible !important;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        display: block !important;
+      }
+      header, aside, nav, #desktopSidebar, #mobileBottomNav, #mobileSearchDrawer,
+      #mobileMoreDrawer, #toastContainer, #detailModal, #memberModal, #authModal,
+      #pwaInstallPromptBanner, #offlineIndicatorBanner,
+      .no-print, button, input, select {
+        display: none !important;
+      }
+      #tab-dashboard, #tab-tree, #tab-members, #tab-birthdays, #tab-backup, #tab-settings {
+        display: none !important;
+      }
+      #tab-reports {
+        display: block !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+      }
+      #tab-reports > div {
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      #printableReportSheet {
+        display: block !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: #ffffff !important;
+      }
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .animated-menu-text, .animated-dash-stat {
+        background: none !important;
+        -webkit-background-clip: unset !important;
+        -webkit-text-fill-color: #000000 !important;
+        color: #000000 !important;
+        animation: none !important;
+      }
+      #reportFamilyTitle { color: #000000 !important; font-size: 16pt !important; font-weight: 900 !important; }
+      #printableReportSheet .border-b-2 { border-bottom: 2px solid #000000 !important; }
+      .break-inside-avoid, #reportGenerationsContainer > div {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        margin-bottom: 16px !important;
+      }
+      #reportGenerationsContainer .soft-neu-sm {
+        box-shadow: none !important;
+        border: 1px solid #94a3b8 !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+    }
+  </style>
+</head>
+
+<body class="h-full w-full bg-[#f4f6fa] text-slate-800 dark:bg-surface-dark dark:text-slate-100 font-sans antialiased selection:bg-brand-500 selection:text-white transition-colors duration-200 overflow-hidden">
+  
+  <!-- Offline Network Status Alert Banner -->
+  <div id="offlineIndicatorBanner" class="hidden fixed top-0 left-0 right-0 z-50 bg-amber-500 text-slate-950 font-black text-xs py-1.5 px-4 text-center shadow-md flex items-center justify-center space-x-2">
+    <i class="fa-solid fa-triangle-exclamation animate-bounce"></i>
+    <span>Koneksi Offline. Perubahan data disimpan dalam antrean lokal dan akan disinkronkan otomatis saat online.</span>
+  </div>
+
+  <!-- PWA Install Prompt Banner -->
+  <div id="pwaInstallPromptBanner" class="hidden no-print fixed bottom-20 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 sm:w-96 z-40 soft-neu rounded-2xl p-4 shadow-2xl flex items-center justify-between border border-sky-400/30">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-cyan-400 flex items-center justify-center text-white text-lg shrink-0">
+        <i class="fa-solid fa-download"></i>
+      </div>
+      <div>
+        <h4 class="text-xs font-black animated-menu-text leading-tight">Pasang Aplikasi Trah</h4>
+        <p class="text-[10px] text-slate-400">Instal di layar utama Android / Desktop</p>
+      </div>
+    </div>
+    <div class="flex items-center space-x-2">
+      <button onclick="dismissInstallBanner()" class="text-xs text-slate-400 p-1 hover:text-slate-600">Nanti</button>
+      <button onclick="triggerPwaInstall()" class="px-3 py-1.5 rounded-xl bg-brand-600 text-white font-black text-xs shadow-md shadow-brand-500/20 active:scale-95 transition">Instal</button>
+    </div>
+  </div>
+
+  <div id="app" class="flex h-full w-full flex-col lg:flex-row overflow-hidden relative">
+    
+    <!-- DESKTOP SIDEBAR -->
+    <aside id="desktopSidebar" class="no-print hidden lg:flex w-72 bg-white/95 dark:bg-surface-darkCard/95 backdrop-blur-md border-r border-slate-200/80 dark:border-slate-800 flex-col shrink-0 z-30 transition-all duration-300">
+      <div class="p-6 border-b border-slate-100 dark:border-slate-800/80 flex items-center space-x-3.5">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-600 via-sky-500 to-cyan-400 flex items-center justify-center text-white shadow-lg shadow-sky-500/25 ring-2 ring-white/60 dark:ring-slate-800 transform hover:scale-105 transition-transform duration-200">
+          <i class="fa-solid fa-tree text-2xl"></i>
+        </div>
+        <div class="overflow-hidden">
+          <h1 class="font-extrabold text-sm animated-menu-text truncate" id="brandFamilyNameDesktop">Silsilah Keluarga</h1>
+          <p class="text-[10px] text-brand-600 dark:text-brand-400 font-extrabold tracking-wider uppercase mt-0.5 flex items-center space-x-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
+            <span class="animated-menu-text">Trah Digital Enterprise</span>
+          </p>
+        </div>
+      </div>
+
+      <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+        <button onclick="switchTab('dashboard')" id="sidebar-nav-dashboard" class="sidebar-item w-full flex items-center space-x-3.5 px-4 py-3.5 rounded-2xl font-black text-xs transition-all duration-200 text-brand-700 bg-brand-50 dark:bg-brand-900/30 dark:text-brand-300 shadow-sm border border-brand-200/50 dark:border-brand-800/50">
+          <div class="w-8 h-8 rounded-xl flex items-center justify-center text-sky-600 dark:text-sky-400 soft-neu-sm shrink-0">
+            <i class="fa-solid fa-chart-pie text-sm"></i>
+          </div>
+          <span class="menu-label-text animated-menu-text">Dasbor & Ringkasan</span>
+        </button>
+
+        <button onclick="switchTab('tree')" id="sidebar-nav-tree" class="sidebar-item w-full flex items-center space-x-3.5 px-4 py-3.5 rounded-2xl font-bold text-xs transition-all duration-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800/50">
+          <div class="w-8 h-8 rounded-xl flex items-center justify-center text-indigo-500 dark:text-indigo-400 soft-neu-sm shrink-0">
+            <i class="fa-solid fa-diagram-project text-sm"></i>
+          </div>
+          <span class="menu-label-text">Pohon Silsilah Visual</span>
+        </button>
+
+        <button onclick="switchTab('members')" id="sidebar-nav-members" class="sidebar-item w-full flex items-center space-x-3.5 px-4 py-3.5 rounded-2xl font-bold text-xs transition-all duration-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800/50">
+          <div class="w-8 h-8 rounded-xl flex items-center justify-center text-amber-500 dark:text-amber-400 soft-neu-sm shrink-0">
+            <i class="fa-solid fa-users text-sm"></i>
+          </div>
+          <span class="menu-label-text">Daftar Anggota</span>
+        </button>
+
+        <button onclick="switchTab('birthdays')" id="sidebar-nav-birthdays" class="sidebar-item w-full flex items-center space-x-3.5 px-4 py-3.5 rounded-2xl font-bold text-xs transition-all duration-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800/50">
+          <div class="w-8 h-8 rounded-xl flex items-center justify-center text-pink-500 dark:text-pink-400 soft-neu-sm shrink-0">
+            <i class="fa-solid fa-cake-candles text-sm"></i>
+          </div>
+          <div class="flex items-center justify-between flex-1">
+            <span class="menu-label-text">Kalender Ulang Tahun</span>
+            <span id="sidebarBirthdayBadge" class="hidden text-[9px] font-black bg-pink-500 text-white px-2 py-0.5 rounded-full shadow-sm">0</span>
+          </div>
+        </button>
+
+        <button onclick="switchTab('reports')" id="sidebar-nav-reports" class="sidebar-item w-full flex items-center space-x-3.5 px-4 py-3.5 rounded-2xl font-bold text-xs transition-all duration-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800/50">
+          <div class="w-8 h-8 rounded-xl flex items-center justify-center text-rose-500 dark:text-rose-400 soft-neu-sm shrink-0">
+            <i class="fa-solid fa-file-invoice text-sm"></i>
+          </div>
+          <span class="menu-label-text">Laporan & Cetak PDF</span>
+        </button>
+
+        <button onclick="switchTab('backup')" id="sidebar-nav-backup" class="sidebar-item w-full flex items-center space-x-3.5 px-4 py-3.5 rounded-2xl font-bold text-xs transition-all duration-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800/50">
+          <div class="w-8 h-8 rounded-xl flex items-center justify-center text-cyan-500 dark:text-cyan-400 soft-neu-sm shrink-0">
+            <i class="fa-brands fa-google-drive text-sm"></i>
+          </div>
+          <span class="menu-label-text">Pencadangan & Drive</span>
+        </button>
+
+        <button onclick="switchTab('settings')" id="sidebar-nav-settings" class="sidebar-item w-full flex items-center space-x-3.5 px-4 py-3.5 rounded-2xl font-bold text-xs transition-all duration-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800/50">
+          <div class="w-8 h-8 rounded-xl flex items-center justify-center text-purple-500 dark:text-purple-400 soft-neu-sm shrink-0">
+            <i class="fa-solid fa-sliders text-sm"></i>
+          </div>
+          <span class="menu-label-text">Pengaturan Trah</span>
+        </button>
+      </nav>
+
+      <div class="p-4 border-t border-slate-100 dark:border-slate-800/80">
+        <div class="soft-neu-sm p-3.5 rounded-2xl flex items-center justify-between">
+          <div class="flex items-center space-x-3 overflow-hidden">
+            <div id="desktopUserAvatar" class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-400 via-cyan-500 to-indigo-500 flex items-center justify-center font-black text-white text-xs shadow-md shrink-0">
+              AD
+            </div>
+            <div class="truncate">
+              <p id="desktopUserName" class="text-xs font-bold text-slate-900 dark:text-white truncate">Administrator</p>
+              <p id="desktopUserRole" class="text-[10px] animated-menu-text font-black uppercase tracking-wider">Akses Penuh</p>
+            </div>
+          </div>
+          <button onclick="handleAuthAction()" title="Ganti Mode / Otentikasi" class="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+            <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN APPLICATION CONTAINER -->
+    <div class="flex-1 flex flex-col h-full w-full overflow-hidden relative">
+      
+      <!-- TOP NAVIGATION BAR -->
+      <header class="no-print h-16 bg-white/95 dark:bg-surface-darkCard/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 px-4 sm:px-6 flex items-center justify-between shrink-0 z-20 sticky top-0 pt-safe">
+        <div class="flex items-center space-x-2.5 sm:space-x-3 overflow-hidden">
+          <button onclick="handleTopBackAction()" id="topBarBackBtn" class="hidden w-9 h-9 rounded-xl soft-neu-sm flex items-center justify-center text-slate-700 dark:text-slate-200 active:scale-90 transition shrink-0" title="Kembali">
+            <i class="fa-solid fa-arrow-left text-xs"></i>
+          </button>
+          <div id="topBarLogoIcon" class="lg:hidden w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-600 to-sky-400 flex items-center justify-center text-white shadow-md shadow-sky-500/20 shrink-0">
+            <i class="fa-solid fa-tree text-lg"></i>
+          </div>
+          <div class="overflow-hidden">
+            <h2 id="topBarTitle" class="font-black text-sm sm:text-base animated-menu-text leading-tight truncate">Dasbor Keluarga</h2>
+            <p id="topBarSubtitle" class="text-[11px] text-slate-400 truncate max-w-[190px] sm:max-w-md hidden sm:block">Guyub Rukun Mbangun Katentreman</p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-1.5 sm:space-x-2.5 shrink-0">
+          <div class="relative hidden md:block">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-400"></i>
+            <input type="text" id="desktopSearchInput" oninput="handleGlobalSearch(this.value)" placeholder="Cari nama, NIK, kota..." class="pl-9 pr-4 py-2 text-xs font-semibold rounded-xl soft-neu-inset border-0 focus:ring-2 focus:ring-brand-500 w-44 lg:w-60 transition-all text-slate-800 dark:text-slate-100">
+          </div>
+          <button onclick="toggleMobileSearchBar()" title="Cari Anggota" class="md:hidden w-10 h-10 rounded-2xl soft-neu-sm flex items-center justify-center text-slate-600 dark:text-slate-300 active:scale-95 transition">
+            <i class="fa-solid fa-magnifying-glass text-xs"></i>
+          </button>
+          <button onclick="openMemberModal()" class="hidden sm:flex px-4 py-2.5 rounded-2xl bg-gradient-to-r from-brand-600 to-sky-500 hover:from-brand-700 hover:to-sky-600 text-white font-extrabold text-xs items-center space-x-2 shadow-md shadow-sky-600/25 active:scale-95 transition-all">
+            <i class="fa-solid fa-user-plus text-xs"></i>
+            <span>Tambah</span>
+          </button>
+          <button onclick="toggleTheme()" title="Ubah Mode Tema" class="w-10 h-10 rounded-2xl soft-neu-sm flex items-center justify-center text-slate-600 dark:text-slate-300 active:scale-95 transition">
+            <i id="themeIcon" class="fa-solid fa-moon text-xs sm:text-sm"></i>
+          </button>
+          <button onclick="reloadAllData(true)" id="syncButton" title="Sinkronkan Data" class="w-10 h-10 rounded-2xl soft-neu-sm flex items-center justify-center text-slate-600 dark:text-slate-300 active:scale-95 transition">
+            <i class="fa-solid fa-rotate text-xs sm:text-sm"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Expandable Mobile Search Drawer -->
+      <div id="mobileSearchDrawer" style="display: none;" class="no-print hidden md:hidden px-4 py-2.5 bg-white/95 dark:bg-surface-darkCard/95 border-b border-slate-200/80 dark:border-slate-800 transition-all duration-200 z-10">
+        <div class="relative w-full">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-400"></i>
+          <input type="text" id="mobileSearchInput" oninput="handleGlobalSearch(this.value)" placeholder="Cari nama, NIK, kota..." class="w-full pl-9 pr-9 py-2.5 text-xs font-semibold rounded-2xl soft-neu-inset border-0 focus:ring-2 focus:ring-brand-500 text-slate-800 dark:text-slate-100">
+          <button onclick="toggleMobileSearchBar()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 p-1">
+            <i class="fa-solid fa-xmark text-xs"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- MAIN SCROLLABLE CONTENT VIEWPORT -->
+      <main class="flex-1 overflow-y-auto overflow-x-hidden p-3.5 sm:p-6 lg:p-8 pb-28 lg:pb-8" id="mainScrollArea">
+        
+        <!-- TAB 1: DASBOR & RINGKASAN -->
+        <section id="tab-dashboard" class="tab-content block space-y-4 sm:space-y-6">
+          <div class="rounded-3xl bg-gradient-to-br from-brand-700 via-sky-700 to-cyan-900 text-white p-5 sm:p-8 relative overflow-hidden shadow-xl shadow-brand-900/20">
+            <div class="relative z-10 max-w-2xl">
+              <span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/20 text-white text-[10px] sm:text-[11px] font-black uppercase tracking-wider backdrop-blur-md">
+                <i class="fa-solid fa-shield-halved text-amber-300"></i>
+                <span class="animated-menu-text">Silsilah Digital Enterprise</span>
+              </span>
+              <h2 class="text-xl sm:text-3xl font-black mt-3 leading-tight tracking-tight" id="dashHeroTitle">Selamat Datang di Trah Keluarga</h2>
+              <p class="text-xs sm:text-sm text-sky-100/90 mt-2 font-medium leading-relaxed" id="dashHeroDesc">
+                Data tersinkronisasi otomatis dengan Google Sheets & Google Drive. Jelajahi garis silsilah antargenerasi dengan aman.
+              </p>
+              
+              <div class="mt-5 flex flex-wrap gap-2.5 sm:gap-3">
+                <button onclick="switchTab('tree')" class="px-4 py-2.5 rounded-2xl bg-white text-brand-800 font-black text-xs hover:bg-sky-50 active:scale-95 transition-all flex items-center space-x-2 shadow-sm">
+                  <i class="fa-solid fa-diagram-project text-xs text-indigo-600"></i>
+                  <span>Buka Pohon Visual</span>
+                </button>
+                <button onclick="switchTab('birthdays')" class="px-4 py-2.5 rounded-2xl bg-pink-500/30 hover:bg-pink-500/40 active:scale-95 text-white font-bold text-xs transition-all border border-pink-300/30 flex items-center space-x-2 backdrop-blur-sm">
+                  <i class="fa-solid fa-cake-candles text-xs text-pink-300"></i>
+                  <span>Jadwal Ulang Tahun</span>
+                </button>
+                <button onclick="switchTab('reports')" class="px-4 py-2.5 rounded-2xl bg-sky-950/40 hover:bg-sky-950/60 active:scale-95 text-white font-bold text-xs transition-all border border-white/20 flex items-center space-x-2 backdrop-blur-sm">
+                  <i class="fa-solid fa-print text-xs text-rose-300"></i>
+                  <span>Cetak Buku Trah</span>
+                </button>
+              </div>
+            </div>
+            <i class="fa-solid fa-tree absolute -right-6 -bottom-6 text-8xl sm:text-9xl text-white/10 pointer-events-none"></i>
+          </div>
+
+          <!-- Quick Action Speed-Dial Grid -->
+          <div class="soft-neu rounded-3xl p-4 sm:p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <div class="w-7 h-7 rounded-xl bg-brand-100 dark:bg-brand-950/60 text-brand-600 flex items-center justify-center text-xs soft-neu-sm">
+                  <i class="fa-solid fa-bolt text-amber-500"></i>
+                </div>
+                <h3 class="text-xs sm:text-sm font-black animated-menu-text">Akses Cepat & Tindakan Utama</h3>
+              </div>
+              <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Pintasan 1-Ketuk</span>
+            </div>
+
+            <div class="grid grid-cols-3 sm:grid-cols-6 gap-2.5 sm:gap-3">
+              <button onclick="quickAddAction()" class="soft-neu-sm p-3 rounded-2xl flex flex-col items-center justify-center space-y-2 hover:bg-brand-50/50 dark:hover:bg-brand-950/30 active:scale-95 transition-transform group">
+                <div class="w-10 h-10 rounded-2xl bg-brand-100 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 flex items-center justify-center text-sm shadow-sm group-hover:scale-110 transition-transform">
+                  <i class="fa-solid fa-user-plus"></i>
+                </div>
+                <span class="text-[10px] sm:text-[11px] font-bold text-slate-700 dark:text-slate-200 text-center leading-tight">Tambah Anggota</span>
+              </button>
+
+              <button onclick="quickTreeAction()" class="soft-neu-sm p-3 rounded-2xl flex flex-col items-center justify-center space-y-2 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30 active:scale-95 transition-transform group">
+                <div class="w-10 h-10 rounded-2xl bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-sm shadow-sm group-hover:scale-110 transition-transform">
+                  <i class="fa-solid fa-diagram-project"></i>
+                </div>
+                <span class="text-[10px] sm:text-[11px] font-bold text-slate-700 dark:text-slate-200 text-center leading-tight">Pohon Silsilah</span>
+              </button>
+
+              <button onclick="quickBirthdayAction()" class="soft-neu-sm p-3 rounded-2xl flex flex-col items-center justify-center space-y-2 hover:bg-pink-50/50 dark:hover:bg-pink-950/30 active:scale-95 transition-transform group">
+                <div class="w-10 h-10 rounded-2xl bg-pink-100 dark:bg-pink-950/60 text-pink-600 dark:text-pink-400 flex items-center justify-center text-sm shadow-sm group-hover:scale-110 transition-transform">
+                  <i class="fa-solid fa-cake-candles"></i>
+                </div>
+                <span class="text-[10px] sm:text-[11px] font-bold text-slate-700 dark:text-slate-200 text-center leading-tight">Kalender Ultah</span>
+              </button>
+
+              <button onclick="quickSearchAction()" class="soft-neu-sm p-3 rounded-2xl flex flex-col items-center justify-center space-y-2 hover:bg-cyan-50/50 dark:hover:bg-cyan-950/30 active:scale-95 transition-transform group">
+                <div class="w-10 h-10 rounded-2xl bg-cyan-100 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 flex items-center justify-center text-sm shadow-sm group-hover:scale-110 transition-transform">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <span class="text-[10px] sm:text-[11px] font-bold text-slate-700 dark:text-slate-200 text-center leading-tight">Cari Anggota</span>
+              </button>
+
+              <button onclick="quickReportAction()" class="soft-neu-sm p-3 rounded-2xl flex flex-col items-center justify-center space-y-2 hover:bg-rose-50/50 dark:hover:bg-rose-950/30 active:scale-95 transition-transform group">
+                <div class="w-10 h-10 rounded-2xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center text-sm shadow-sm group-hover:scale-110 transition-transform">
+                  <i class="fa-solid fa-file-pdf"></i>
+                </div>
+                <span class="text-[10px] sm:text-[11px] font-bold text-slate-700 dark:text-slate-200 text-center leading-tight">Buku & Cetak</span>
+              </button>
+
+              <button onclick="quickBackupAction()" class="soft-neu-sm p-3 rounded-2xl flex flex-col items-center justify-center space-y-2 hover:bg-amber-50/50 dark:hover:bg-amber-950/30 active:scale-95 transition-transform group">
+                <div class="w-10 h-10 rounded-2xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center text-sm shadow-sm group-hover:scale-110 transition-transform">
+                  <i class="fa-brands fa-google-drive"></i>
+                </div>
+                <span class="text-[10px] sm:text-[11px] font-bold text-slate-700 dark:text-slate-200 text-center leading-tight">Cadang Drive</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Statistical Metrics Grid -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div class="soft-neu p-4 sm:p-5 rounded-2xl sm:rounded-3xl flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-black uppercase tracking-wider animated-menu-text">Total Jiwa</span>
+                <div class="w-8 h-8 rounded-2xl bg-brand-100 dark:bg-brand-950/70 text-brand-600 dark:text-brand-400 flex items-center justify-center text-xs font-black soft-neu-sm">
+                  <i class="fa-solid fa-users"></i>
+                </div>
+              </div>
+              <div class="mt-3">
+                <p class="text-2xl sm:text-3xl font-black animated-dash-stat" id="statTotal">0</p>
+                <p class="text-[10px] text-slate-400 mt-0.5 truncate">Tercatat di basis data</p>
+              </div>
+            </div>
+
+            <div class="soft-neu p-4 sm:p-5 rounded-2xl sm:rounded-3xl flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-black uppercase tracking-wider animated-menu-text">Generasi</span>
+                <div class="w-8 h-8 rounded-2xl bg-indigo-100 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xs font-black soft-neu-sm">
+                  <i class="fa-solid fa-layer-group"></i>
+                </div>
+              </div>
+              <div class="mt-3">
+                <p class="text-2xl sm:text-3xl font-black animated-dash-stat" id="statGenerasi">0</p>
+                <p class="text-[10px] text-slate-400 mt-0.5 truncate">Tingkatan keturunan</p>
+              </div>
+            </div>
+
+            <div class="soft-neu p-4 sm:p-5 rounded-2xl sm:rounded-3xl flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-black uppercase tracking-wider animated-menu-text">Pria / Wanita</span>
+                <div class="w-8 h-8 rounded-2xl bg-cyan-100 dark:bg-cyan-950/70 text-cyan-600 dark:text-cyan-400 flex items-center justify-center text-xs font-black soft-neu-sm">
+                  <i class="fa-solid fa-venus-mars"></i>
+                </div>
+              </div>
+              <div class="mt-3">
+                <p class="text-2xl sm:text-3xl font-black animated-dash-stat" id="statGenderRatio">0 / 0</p>
+                <p class="text-[10px] text-slate-400 mt-0.5 truncate">Perbandingan gender</p>
+              </div>
+            </div>
+
+            <div class="soft-neu p-4 sm:p-5 rounded-2xl sm:rounded-3xl flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-black uppercase tracking-wider animated-menu-text">Hidup / Wafat</span>
+                <div class="w-8 h-8 rounded-2xl bg-amber-100 dark:bg-amber-950/70 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xs font-black soft-neu-sm">
+                  <i class="fa-solid fa-heart-pulse"></i>
+                </div>
+              </div>
+              <div class="mt-3">
+                <p class="text-2xl sm:text-3xl font-black animated-dash-stat" id="statLifeRatio">0 / 0</p>
+                <p class="text-[10px] text-slate-400 mt-0.5 truncate">Status keberadaan</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Upcoming Birthdays Widget -->
+          <div class="soft-neu rounded-3xl p-5 sm:p-6 space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2.5">
+                <div class="w-8 h-8 rounded-xl bg-pink-100 dark:bg-pink-950/80 text-pink-600 dark:text-pink-400 flex items-center justify-center text-sm soft-neu-sm birthday-glow">
+                  <i class="fa-solid fa-cake-candles"></i>
+                </div>
+                <div>
+                  <h3 class="font-black text-xs sm:text-sm animated-menu-text">Ulang Tahun Mendatang</h3>
+                  <p class="text-[10px] text-slate-400">Jaga silaturahmi dengan ucapan selamat hangat</p>
+                </div>
+              </div>
+              <button onclick="switchTab('birthdays')" class="text-xs text-pink-600 dark:text-pink-400 font-black hover:underline flex items-center space-x-1">
+                <span>Lihat Semua Kalender</span>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+              </button>
+            </div>
+            <div id="dashUpcomingBirthdaysList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+          </div>
+
+          <!-- Direct Line Ancestors & Recent Entries -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+            <div class="soft-neu rounded-3xl p-5 sm:p-6 space-y-4">
+              <div class="flex items-center justify-between">
+                <h3 class="font-black text-xs sm:text-sm flex items-center space-x-2">
+                  <i class="fa-solid fa-crown text-amber-500 text-sm"></i>
+                  <span class="animated-menu-text">Sesepuh Generasi Pertama</span>
+                </h3>
+                <button onclick="switchTab('members')" class="text-xs text-brand-600 dark:text-brand-400 font-black hover:underline">Semua</button>
+              </div>
+              <div id="ancestorsList" class="space-y-2.5"></div>
+            </div>
+
+            <div class="soft-neu rounded-3xl p-5 sm:p-6 space-y-4">
+              <div class="flex items-center justify-between">
+                <h3 class="font-black text-xs sm:text-sm flex items-center space-x-2">
+                  <i class="fa-solid fa-clock-rotate-left text-brand-500 text-sm"></i>
+                  <span class="animated-menu-text">Anggota Terkini</span>
+                </h3>
+                <button onclick="openMemberModal()" class="text-xs text-brand-600 dark:text-brand-400 font-black hover:underline">+ Baru</button>
+              </div>
+              <div id="recentMembersList" class="space-y-2.5"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 2: KALENDER ULANG TAHUN & HAUL -->
+        <section id="tab-birthdays" class="tab-content hidden space-y-5">
+          <div class="soft-neu p-4 sm:p-5 rounded-3xl space-y-4">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div>
+                <h3 class="font-black text-sm sm:text-base animated-menu-text flex items-center space-x-2">
+                  <i class="fa-solid fa-cake-candles text-pink-500"></i>
+                  <span>Kalender Ulang Tahun & Silaturahmi Trah</span>
+                </h3>
+                <p class="text-xs text-slate-400 mt-0.5">Daftar hari lahir seluruh anggota keluarga, perhitungan usia, dan pintasan ucapan WhatsApp.</p>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-2">
+                <select id="birthdayMonthFilter" onchange="renderBirthdayFullCalendar()" class="text-xs font-bold px-3.5 py-2.5 rounded-2xl soft-neu-inset border-0 focus:ring-2 focus:ring-brand-500 text-slate-800 dark:text-slate-100">
+                  <option value="UPCOMING_30">30 Hari Kedepan</option>
+                  <option value="ALL">Semua Bulan</option>
+                  <option value="0">Januari</option>
+                  <option value="1">Februari</option>
+                  <option value="2">Maret</option>
+                  <option value="3">April</option>
+                  <option value="4">Mei</option>
+                  <option value="5">Juni</option>
+                  <option value="6">Juli</option>
+                  <option value="7">Agustus</option>
+                  <option value="8">September</option>
+                  <option value="9">Oktober</option>
+                  <option value="10">November</option>
+                  <option value="11">Desember</option>
+                </select>
+
+                <select id="birthdayStatusFilter" onchange="renderBirthdayFullCalendar()" class="text-xs font-bold px-3.5 py-2.5 rounded-2xl soft-neu-inset border-0 focus:ring-2 focus:ring-brand-500 text-slate-800 dark:text-slate-100">
+                  <option value="Hidup">Hanya yang Masih Hidup</option>
+                  <option value="ALL">Semua Status (Termasuk Haul)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="relative w-full">
+              <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-400"></i>
+              <input type="text" id="birthdaySearchInput" oninput="renderBirthdayFullCalendar()" placeholder="Cari nama anggota pada kalender ulang tahun..." class="w-full pl-9 pr-4 py-2.5 text-xs font-semibold rounded-2xl soft-neu-inset border-0 focus:ring-2 focus:ring-brand-500 text-slate-800 dark:text-slate-100">
+            </div>
+          </div>
+
+          <div id="birthdayCalendarCardsContainer" class="space-y-6"></div>
+        </section>
+
+        <!-- TAB 3: POHON SILSILAH VISUAL -->
+        <section id="tab-tree" class="tab-content hidden h-[calc(100vh-185px)] sm:h-[calc(100vh-155px)] flex-col space-y-3">
+          <div class="soft-neu p-3 sm:p-3.5 rounded-2xl sm:rounded-3xl flex flex-wrap items-center justify-between gap-2.5 shrink-0">
+            <div class="flex items-center space-x-2 flex-1 min-w-[200px]">
+              <label class="text-[11px] font-black animated-menu-text shrink-0">Pusat Silsilah:</label>
+              <select id="treeRootSelector" onchange="renderFamilyTree()" class="text-xs font-bold px-3 py-1.5 rounded-xl soft-neu-inset border-0 focus:ring-2 focus:ring-brand-500 text-slate-800 dark:text-slate-100 w-full sm:w-auto"></select>
+            </div>
+
+            <div class="flex items-center space-x-1.5 soft-neu-inset p-1 rounded-2xl">
+              <button onclick="zoomTree(1.15)" title="Perbesar" class="w-8 h-8 rounded-xl soft-neu-sm flex items-center justify-center text-slate-700 dark:text-slate-200 active:scale-95 transition">
+                <i class="fa-solid fa-plus text-xs"></i>
+              </button>
+              <button onclick="zoomTree(0.85)" title="Perkecil" class="w-8 h-8 rounded-xl soft-neu-sm flex items-center justify-center text-slate-700 dark:text-slate-200 active:scale-95 transition">
+                <i class="fa-solid fa-minus text-xs"></i>
+              </button>
+              <button onclick="resetTreeZoom()" title="Reset Tampilan" class="w-8 h-8 rounded-xl soft-neu-sm flex items-center justify-center text-slate-700 dark:text-slate-200 active:scale-95 transition">
+                <i class="fa-solid fa-arrows-to-dot text-xs"></i>
+              </button>
+              <button onclick="prepareAndPrintReport()" title="Cetak Dokumen" class="w-8 h-8 rounded-xl soft-neu-sm flex items-center justify-center text-slate-700 dark:text-slate-200 active:scale-95 transition">
+                <i class="fa-solid fa-print text-xs"></i>
+              </button>
+            </div>
+          </div>
+
+          <div id="treeViewport" class="tree-viewport-area flex-1 soft-neu-inset rounded-3xl overflow-hidden relative border border-slate-200/80 dark:border-slate-800">
+            <div class="absolute top-3 left-3 z-10 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md px-3 py-1.5 rounded-2xl soft-neu-sm text-[10px] text-slate-500 flex items-center space-x-2 pointer-events-none">
+              <i class="fa-solid fa-hand-pointer text-brand-600"></i>
+              <span>Geser kanvas dengan satu jempol / mouse • Gunakan tombol zoom</span>
+            </div>
+
+            <div id="treeCanvas" class="absolute origin-top-left transition-transform duration-75">
+              <svg id="treeConnectionsSvg" class="absolute inset-0 pointer-events-none overflow-visible w-full h-full"></svg>
+              <div id="treeNodesContainer" class="relative p-8 sm:p-14 min-w-max min-h-max"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 4: DAFTAR ANGGOTA -->
+        <section id="tab-members" class="tab-content hidden space-y-4">
+          <div class="soft-neu p-3.5 sm:p-4 rounded-3xl flex flex-col md:flex-row gap-3 items-center justify-between">
+            <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 w-full md:w-auto">
+              <input type="text" id="memberFilterSearch" oninput="filterMemberList()" placeholder="Cari nama, NIK..." class="col-span-2 sm:w-56 text-xs font-semibold px-3.5 py-2.5 rounded-2xl soft-neu-inset border-0 focus:ring-2 focus:ring-brand-500 text-slate-800 dark:text-slate-100">
+              
+              <select id="filterGenerasi" onchange="filterMemberList()" class="text-xs font-semibold px-3 py-2.5 rounded-2xl soft-neu-inset border-0 focus:ring-2 focus:ring-brand-500 text-slate-800 dark:text-slate-100">
+                <option value="">Semua Gen</option>
+                <option value="1">Generasi 1</option>
+                <option value="2">Generasi 2</option>
+                <option value="3">Generasi 3</option>
+                <option value="4">Gen 4+</option>
+              </select>
+
+              <select id="filterGender" onchange="filterMemberList()" class="text-xs font-semibold px-3 py-2.5 rounded-2xl soft-neu-inset border-0 focus:ring-2 focus:ring-brand-500 text-slate-800 dark:text-slate-100">
+                <option value="">Gender</option>
+                <option value="L">Laki-laki</option>
+                <option value="P">Perempuan</option>
+              </select>
+
+              <select id="filterStatus" onchange="filterMemberList()" class="col-span-2 sm:col-span-1 text-xs font-semibold px-3 py-2.5 rounded-2xl soft-neu-inset border-0 focus:ring-2 focus:ring-brand-500 text-slate-800 dark:text-slate-100">
+                <option value="">Semua Status</option>
+                <option value="Hidup">Hidup</option>
+                <option value="Wafat">Wafat</option>
+              </select>
+            </div>
+
+            <div class="flex items-center space-x-2 self-end md:self-auto shrink-0">
+              <div class="soft-neu-inset p-1 rounded-2xl flex items-center space-x-1">
+                <button onclick="setMemberViewMode('grid')" id="btnViewGrid" title="Tampilan Kartu Grid" class="w-8 h-8 rounded-xl soft-neu-sm text-brand-600 dark:text-brand-400 text-xs flex items-center justify-center transition">
+                  <i class="fa-solid fa-grip"></i>
+                </button>
+                <button onclick="setMemberViewMode('table')" id="btnViewTable" title="Tampilan Tabel" class="w-8 h-8 rounded-xl text-slate-400 text-xs flex items-center justify-center transition">
+                  <i class="fa-solid fa-table-list"></i>
+                </button>
+              </div>
+              <button onclick="openMemberModal()" class="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-brand-600 to-cyan-500 hover:from-brand-700 hover:to-cyan-600 text-white font-extrabold text-xs flex items-center space-x-1.5 shadow-md shadow-brand-600/20 active:scale-95 transition">
+                <i class="fa-solid fa-plus text-xs"></i>
+                <span class="hidden sm:inline">Tambah Anggota</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="membersGridContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5 sm:gap-4"></div>
+
+          <div id="membersTableContainer" class="hidden soft-neu rounded-3xl overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="border-b border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 text-slate-500 dark:text-slate-400 font-black uppercase tracking-wider text-[10px]">
+                    <th class="p-4 pl-6">Nama Anggota</th>
+                    <th class="p-4">Gen</th>
+                    <th class="p-4">Gender</th>
+                    <th class="p-4">Kelahiran</th>
+                    <th class="p-4">Status</th>
+                    <th class="p-4">Pasangan</th>
+                    <th class="p-4">Kontak</th>
+                    <th class="p-4 pr-6 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="membersTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/80"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 5: LAPORAN & CETAK PDF -->
+        <section id="tab-reports" class="tab-content hidden space-y-5">
+          <div class="soft-neu rounded-3xl p-5 sm:p-8 space-y-6">
+            <div class="no-print flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800/80 pb-5">
+              <div>
+                <h3 class="text-base sm:text-lg font-black animated-menu-text">Buku Silsilah Siap Cetak (A4 / PDF)</h3>
+                <p class="text-xs text-slate-400 mt-1">Diformat rapi untuk printer kertas dokumen atau ekspor file PDF resmi.</p>
+              </div>
+              <button onclick="prepareAndPrintReport()" class="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-rose-600 to-pink-500 hover:from-rose-700 hover:to-pink-600 text-white font-black text-xs flex items-center justify-center space-x-2 shadow-md shadow-rose-600/25 active:scale-95 transition">
+                <i class="fa-solid fa-file-pdf"></i>
+                <span>Cetak / Ekspor PDF</span>
+              </button>
+            </div>
+
+            <div id="printableReportSheet" class="p-5 sm:p-10 soft-neu-inset rounded-3xl print:p-0 print:bg-white print:shadow-none">
+              <div class="text-center pb-6 border-b-2 border-slate-300 dark:border-slate-700 print:border-black">
+                <h1 class="text-xl sm:text-2xl font-black uppercase tracking-tight animated-menu-text" id="reportFamilyTitle">BUKU SILSILAH KELUARGA BESAR</h1>
+                <p class="text-xs sm:text-sm italic font-serif text-slate-600 dark:text-slate-400 mt-1" id="reportMottoTitle">"Guyub Rukun Mbangun Katentreman"</p>
+                <p class="text-[11px] text-slate-400 mt-2">Dokumen Resmi Trah • Dicetak: <span id="reportPrintDate"></span></p>
+              </div>
+
+              <div id="reportGenerationsContainer" class="mt-6 space-y-6"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 6: PENCADANGAN & DRIVE -->
+        <section id="tab-backup" class="tab-content hidden space-y-5">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+            <div class="soft-neu p-5 sm:p-7 rounded-3xl space-y-4 flex flex-col justify-between">
+              <div class="space-y-3">
+                <div class="w-12 h-12 rounded-2xl bg-cyan-100 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 flex items-center justify-center text-2xl soft-neu-sm">
+                  <i class="fa-brands fa-google-drive"></i>
+                </div>
+                <h3 class="font-black text-base animated-menu-text">Pencadangan Otomatis Google Drive</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                  Menyimpan cadangan terenkripsi seluruh basis data keluarga langsung ke folder khusus Google Drive Anda.
+                </p>
+              </div>
+
+              <div class="pt-4 space-y-3">
+                <button onclick="triggerDriveBackup()" id="btnDriveBackup" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-700 hover:to-indigo-700 text-white font-black text-xs flex items-center justify-center space-x-2 shadow-md shadow-cyan-600/20 active:scale-95 transition">
+                  <i class="fa-solid fa-cloud-arrow-up"></i>
+                  <span>Cadangkan Sekarang ke Drive</span>
+                </button>
+                <div id="backupResultAlert" class="hidden p-3.5 rounded-2xl text-xs"></div>
+              </div>
+            </div>
+
+            <div class="soft-neu p-5 sm:p-7 rounded-3xl space-y-4">
+              <div class="space-y-3">
+                <div class="w-12 h-12 rounded-2xl bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-2xl soft-neu-sm">
+                  <i class="fa-solid fa-hard-drive"></i>
+                </div>
+                <h3 class="font-black text-base animated-menu-text">Cadangan Mandiri & Pemulihan</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                  Unduh berkas JSON ke memori HP/komputer atau pulihkan database dari berkas cadangan kapan pun.
+                </p>
+              </div>
+
+              <div class="space-y-3 pt-2">
+                <button onclick="downloadJsonBackup()" class="w-full py-3 rounded-2xl soft-neu-sm text-slate-800 dark:text-slate-200 font-bold text-xs flex items-center justify-center space-x-2 active:scale-95 transition">
+                  <i class="fa-solid fa-download text-indigo-500"></i>
+                  <span>Unduh File JSON</span>
+                </button>
+
+                <div class="pt-3 border-t border-slate-100 dark:border-slate-800">
+                  <label class="block text-xs font-bold text-slate-500 mb-2">Impor Berkas JSON:</label>
+                  <input type="file" id="restoreFileInput" accept=".json" class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100">
+                  <button onclick="triggerRestoreFromFile()" class="mt-3 w-full py-3 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs flex items-center justify-center space-x-2 shadow-sm active:scale-95 transition">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>Pulihkan Data Sekarang</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 7: PENGATURAN KELUARGA -->
+        <section id="tab-settings" class="tab-content hidden space-y-5">
+          <div class="max-w-2xl soft-neu rounded-3xl p-5 sm:p-8 space-y-5">
+            <div>
+              <h3 class="text-base sm:text-lg font-black animated-menu-text">Pengaturan Profil Trah</h3>
+              <p class="text-xs text-slate-400 mt-1">Ubah identitas trah keluarga dan kode keamanan akun.</p>
+            </div>
+
+            <form id="settingsForm" onsubmit="handleSaveSettings(event)" class="space-y-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1.5">Nama Keluarga / Trah / Bani *</label>
+                <input type="text" id="settingNamaKeluarga" required class="w-full text-xs font-medium px-4 py-3 rounded-2xl soft-neu-inset border-0 focus:ring-2 focus:ring-brand-500 text-slate-800 dark:text-slate-100">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1.5">Motto / Slogan Trah</label>
+                <input type="text" id="settingMotto" class="w-full text-xs font-medium px-4 py-3 rounded-2xl soft-neu-inset border-0 focus:ring-2 focus:ring-brand-500 text-slate-800 dark:text-slate-100">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1.5">Sejarah / Catatan Silsilah</label>
+                <textarea id="settingDeskripsi" rows="3" class="w-full text-xs font-medium px-4 py-3 rounded-2xl soft-neu-inset border-0 focus:ring-2 focus:ring-brand-500 text-slate-800 dark:text-slate-100"></textarea>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1.5">PIN Administrator Baru (6 Digit)</label>
+                <input type="password" id="settingAdminPin" maxlength="6" placeholder="Kosongkan bila tidak diubah" class="w-full text-xs font-medium px-4 py-3 rounded-2xl soft-neu-inset border-0 focus:ring-2 focus:ring-brand-500 text-slate-800 dark:text-slate-100">
+              </div>
+
+              <div class="pt-3">
+                <button type="submit" class="w-full sm:w-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-black text-xs flex items-center justify-center space-x-2 shadow-md shadow-purple-600/20 active:scale-95 transition">
+                  <i class="fa-solid fa-floppy-disk"></i>
+                  <span>Simpan Pengaturan</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+      </main>
+
+      <!-- MOBILE BOTTOM NAVIGATION BAR -->
+      <nav id="mobileBottomNav" class="no-print lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-surface-darkCard/95 backdrop-blur-xl border-t border-slate-200/90 dark:border-slate-800/90 pb-safe shadow-[0_-4px_24px_rgba(0,0,0,0.07)]">
+        <div class="grid grid-cols-5 h-16 items-center px-1">
+          <button onclick="switchTab('dashboard')" id="bnav-dashboard" class="bnav-btn flex flex-col items-center justify-center py-1 transition-all duration-150">
+            <div class="w-10 h-7 rounded-full flex items-center justify-center transition-all bg-brand-100/80 dark:bg-brand-900/50 soft-neu-sm text-brand-600 dark:text-brand-400">
+              <i class="fa-solid fa-chart-pie text-sm"></i>
+            </div>
+            <span class="menu-label-text text-[10px] font-black mt-0.5 tracking-tight animated-menu-text">Dasbor</span>
+          </button>
+
+          <button onclick="switchTab('tree')" id="bnav-tree" class="bnav-btn flex flex-col items-center justify-center py-1 transition-all duration-150 text-slate-500 dark:text-slate-400">
+            <div class="w-10 h-7 rounded-full flex items-center justify-center transition-all">
+              <i class="fa-solid fa-diagram-project text-sm"></i>
+            </div>
+            <span class="menu-label-text text-[10px] font-bold mt-0.5 tracking-tight">Pohon</span>
+          </button>
+
+          <div class="flex items-center justify-center">
+            <button onclick="openMemberModal()" title="Tambah Anggota Baru" class="w-12 h-12 -mt-4 rounded-2xl bg-gradient-to-tr from-brand-600 via-sky-500 to-cyan-400 text-white flex items-center justify-center shadow-lg shadow-sky-600/35 active:scale-90 transition-transform">
+              <i class="fa-solid fa-plus text-base"></i>
+            </button>
+          </div>
+
+          <button onclick="switchTab('members')" id="bnav-members" class="bnav-btn flex flex-col items-center justify-center py-1 transition-all duration-150 text-slate-500 dark:text-slate-400">
+            <div class="w-10 h-7 rounded-full flex items-center justify-center transition-all">
+              <i class="fa-solid fa-users text-sm"></i>
+            </div>
+            <span class="menu-label-text text-[10px] font-bold mt-0.5 tracking-tight">Anggota</span>
+          </button>
+
+          <button onclick="toggleMobileMoreMenu()" id="bnav-more" class="bnav-btn flex flex-col items-center justify-center py-1 transition-all duration-150 text-slate-500 dark:text-slate-400">
+            <div class="w-10 h-7 rounded-full flex items-center justify-center transition-all relative">
+              <i class="fa-solid fa-ellipsis text-sm"></i>
+              <span id="mobileMoreBadge" class="hidden absolute -top-1 -right-1 w-2.5 h-2.5 bg-pink-500 rounded-full"></span>
+            </div>
+            <span class="menu-label-text text-[10px] font-bold mt-0.5 tracking-tight">Lainnya</span>
+          </button>
+        </div>
+      </nav>
+
+    </div>
+  </div>
+
+  <!-- MOBILE SPEED-DIAL DRAWER -->
+  <div id="mobileMoreDrawer" style="display: none;" onclick="handleBackdropClick(event, 'mobileMoreDrawer')" class="no-print fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm hidden items-end justify-center p-0">
+    <div onclick="event.stopPropagation()" class="bg-white dark:bg-surface-darkCard rounded-t-3xl border-t border-slate-200 dark:border-slate-800 w-full p-5 space-y-4 pb-safe animate-in fade-in slide-in-from-bottom duration-200 shadow-2xl">
+      <div class="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto"></div>
+      
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="font-black text-sm animated-menu-text">Menu & Akses Cepat</h3>
+          <p class="text-[10px] text-slate-400">Pilih pintasan untuk membuka fitur langsung</p>
+        </div>
+        <span class="text-[10px] bg-brand-50 dark:bg-brand-950/80 text-brand-700 dark:text-brand-300 px-2 py-0.5 rounded-lg font-black uppercase tracking-wider">Akses Cepat</span>
+      </div>
+      
+      <div class="grid grid-cols-3 gap-2.5">
+        <button onclick="quickBirthdayAction()" class="soft-neu p-3 rounded-2xl flex flex-col items-center justify-center space-y-2 active:scale-95 transition">
+          <div class="w-10 h-10 rounded-xl bg-pink-100 text-pink-600 dark:bg-pink-950 dark:text-pink-400 flex items-center justify-center text-sm font-bold">
+            <i class="fa-solid fa-cake-candles"></i>
+          </div>
+          <span class="menu-label-text text-[11px] font-bold text-slate-700 dark:text-slate-200 text-center">Kalender Ultah</span>
+        </button>
+
+        <button onclick="quickReportAction()" class="soft-neu p-3 rounded-2xl flex flex-col items-center justify-center space-y-2 active:scale-95 transition">
+          <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 dark:bg-rose-950 dark:text-rose-400 flex items-center justify-center text-sm font-bold">
+            <i class="fa-solid fa-file-invoice"></i>
+          </div>
+          <span class="menu-label-text text-[11px] font-bold text-slate-700 dark:text-slate-200 text-center">Laporan & PDF</span>
+        </button>
+
+        <button onclick="quickBackupAction()" class="soft-neu p-3 rounded-2xl flex flex-col items-center justify-center space-y-2 active:scale-95 transition">
+          <div class="w-10 h-10 rounded-xl bg-sky-100 text-sky-600 dark:bg-sky-950 dark:text-sky-400 flex items-center justify-center text-sm font-bold">
+            <i class="fa-brands fa-google-drive"></i>
+          </div>
+          <span class="menu-label-text text-[11px] font-bold text-slate-700 dark:text-slate-200 text-center">Cadangan Drive</span>
+        </button>
+
+        <button onclick="quickSearchAction()" class="soft-neu p-3 rounded-2xl flex flex-col items-center justify-center space-y-2 active:scale-95 transition">
+          <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400 flex items-center justify-center text-sm font-bold">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </div>
+          <span class="menu-label-text text-[11px] font-bold text-slate-700 dark:text-slate-200 text-center">Cari Anggota</span>
+        </button>
+
+        <button onclick="quickSettingsAction()" class="soft-neu p-3 rounded-2xl flex flex-col items-center justify-center space-y-2 active:scale-95 transition">
+          <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 dark:bg-purple-950 dark:text-purple-400 flex items-center justify-center text-sm font-bold">
+            <i class="fa-solid fa-sliders"></i>
+          </div>
+          <span class="menu-label-text text-[11px] font-bold text-slate-700 dark:text-slate-200 text-center">Pengaturan</span>
+        </button>
+
+        <button onclick="quickSyncAction()" class="soft-neu p-3 rounded-2xl flex flex-col items-center justify-center space-y-2 active:scale-95 transition">
+          <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 dark:bg-amber-950 dark:text-amber-400 flex items-center justify-center text-sm font-bold">
+            <i class="fa-solid fa-rotate"></i>
+          </div>
+          <span class="menu-label-text text-[11px] font-bold text-slate-700 dark:text-slate-200 text-center">Sinkronisasi</span>
+        </button>
+      </div>
+
+      <button onclick="closeModal('mobileMoreDrawer')" class="w-full py-3 rounded-2xl soft-neu-sm text-xs font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">Tutup Laci</button>
+    </div>
+  </div>
+
+  <!-- MODAL DETAIL ANGGOTA -->
+  <div id="detailModal" style="display: none;" onclick="handleBackdropClick(event, 'detailModal')" class="no-print fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm hidden items-end sm:items-center justify-center p-0 sm:p-4">
+    <div onclick="event.stopPropagation()" class="bg-white dark:bg-surface-darkCard rounded-t-3xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 w-full sm:max-w-lg max-h-[88vh] sm:max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom duration-200">
+      <div class="sm:hidden w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mt-2.5"></div>
+
+      <div class="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <h3 class="font-black text-sm sm:text-base text-slate-900 dark:text-white flex items-center space-x-2">
+          <i class="fa-solid fa-id-card text-brand-600"></i>
+          <span class="animated-menu-text">Profil Lengkap Anggota</span>
+        </h3>
+        <button onclick="closeModal('detailModal')" class="w-8 h-8 rounded-full soft-neu-sm flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <div class="p-5 overflow-y-auto space-y-4 flex-1" id="detailModalBody"></div>
+      <div class="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/40 flex justify-end space-x-2" id="detailModalFooter"></div>
+    </div>
+  </div>
+
+  <!-- MODAL FORM ANGGOTA -->
+  <div id="memberModal" style="display: none;" onclick="handleBackdropClick(event, 'memberModal')" class="no-print fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm hidden items-end sm:items-center justify-center p-0 sm:p-4">
+    <div onclick="event.stopPropagation()" class="bg-white dark:bg-surface-darkCard rounded-t-3xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 w-full sm:max-w-2xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom duration-200">
+      <div class="sm:hidden w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mt-2.5"></div>
+
+      <div class="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <h3 id="memberModalTitle" class="font-black text-sm sm:text-base text-slate-900 dark:text-white flex items-center space-x-2">
+          <i class="fa-solid fa-user-pen text-brand-600"></i>
+          <span class="animated-menu-text">Tambah Anggota Keluarga</span>
+        </h3>
+        <button onclick="closeModal('memberModal')" class="w-8 h-8 rounded-full soft-neu-sm flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <form id="memberForm" onsubmit="handleSaveMember(event)" class="overflow-y-auto p-4 sm:p-6 space-y-4 flex-1">
+        <input type="hidden" id="formMemberId">
+        <input type="hidden" id="formFotoBase64">
+        <input type="hidden" id="formFotoUrlExisting">
+        <input type="hidden" id="formFotoDriveIdExisting">
+
+        <div class="flex flex-col sm:flex-row gap-4 items-center sm:items-start soft-neu p-4 rounded-2xl">
+          <div class="flex flex-col items-center space-y-2">
+            <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl soft-neu-inset overflow-hidden relative flex items-center justify-center text-slate-400">
+              <img id="formFotoPreview" src="" alt="" class="w-full h-full object-cover hidden">
+              <i id="formFotoPlaceholderIcon" class="fa-solid fa-camera text-2xl"></i>
+            </div>
+            <label class="cursor-pointer px-3 py-1.5 rounded-xl bg-brand-50 dark:bg-brand-900/40 text-brand-700 dark:text-brand-300 text-[11px] font-bold hover:bg-brand-100 transition active:scale-95">
+              <span>Pilih / Foto</span>
+              <input type="file" id="formFotoFile" accept="image/*" onchange="previewImageFile(event)" class="hidden">
+            </label>
+          </div>
+          
+          <div class="flex-1 w-full space-y-2.5">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Nama Lengkap & Gelar *</label>
+              <input type="text" id="formNama" required placeholder="Contoh: Raden Mas Suryo, S.T." class="w-full text-xs font-semibold px-3.5 py-2.5 rounded-xl soft-neu-inset border-0 focus:ring-2 focus:ring-brand-500 text-slate-800 dark:text-slate-100">
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">NIK (16 Digit - Opsional)</label>
+                <input type="text" id="formNik" maxlength="16" placeholder="16 Digit NIK" class="w-full text-xs font-semibold px-3.5 py-2.5 rounded-xl soft-neu-inset border-0 focus:ring-2 focus:ring-brand-500 text-slate-800 dark:text-slate-100">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Jenis Kelamin *</label>
+                <select id="formJenisKelamin" required class="w-full text-xs font-semibold px-3.5 py-2.5 rounded-xl soft-neu-inset border-0 focus:ring-2 focus:ring-brand-500 text-slate-800 dark:text-slate-100">
+                  <option value="L">Laki-laki (L)</option>
+                  <option value="P">Perempuan (P)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Tempat Lahir</label>
+            <input type="text" id="formTempatLahir" placeholder="Kota Kelahiran" class="w-full text-xs font-semibold px-3 py-2 rounded-xl soft-neu-inset border-0 text-slate-800 dark:text-slate-100">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Tanggal Lahir *</label>
+            <input type="date" id="formTanggalLahir" required class="w-full text-xs font-semibold px-3 py-2 rounded-xl soft-neu-inset border-0 text-slate-800 dark:text-slate-100">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Status Keberadaan *</label>
+            <select id="formStatusHidup" onchange="toggleWafatInput(this.value)" class="w-full text-xs font-semibold px-3 py-2 rounded-xl soft-neu-inset border-0 text-slate-800 dark:text-slate-100">
+              <option value="Hidup">Masih Hidup</option>
+              <option value="Wafat">Sudah Wafat</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="wafatInputContainer" class="hidden">
+          <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Tanggal Wafat (Meninggal)</label>
+          <input type="date" id="formTanggalWafat" class="w-full text-xs font-semibold px-3 py-2 rounded-xl soft-neu-inset border-0 text-slate-800 dark:text-slate-100">
+        </div>
+
+        <div class="border-t border-slate-100 dark:border-slate-800 pt-3 space-y-2.5">
+          <h4 class="text-[11px] font-black animated-menu-text uppercase tracking-wider">Hubungan Garis Silsilah</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Ayah Kandung</label>
+              <select id="formIdAyah" onchange="calculateSuggestedGeneration()" class="w-full text-xs font-semibold px-3 py-2 rounded-xl soft-neu-inset border-0 text-slate-800 dark:text-slate-100">
+                <option value="">-- Tidak Diketahui / Sesepuh --</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Ibu Kandung</label>
+              <select id="formIdIbu" onchange="calculateSuggestedGeneration()" class="w-full text-xs font-semibold px-3 py-2 rounded-xl soft-neu-inset border-0 text-slate-800 dark:text-slate-100">
+                <option value="">-- Tidak Diketahui / Sesepuh --</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Pasangan (Suami/Istri)</label>
+              <select id="formIdPasangan" class="w-full text-xs font-semibold px-3 py-2 rounded-xl soft-neu-inset border-0 text-slate-800 dark:text-slate-100">
+                <option value="">-- Belum / Tidak Ada --</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Tingkat Generasi *</label>
+              <input type="number" id="formGenerasi" min="1" max="25" required value="1" class="w-full text-xs font-semibold px-3 py-2 rounded-xl soft-neu-inset border-0 text-slate-800 dark:text-slate-100">
+            </div>
+          </div>
+        </div>
+
+        <div class="border-t border-slate-100 dark:border-slate-800 pt-3 space-y-2.5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">No. WhatsApp Aktif</label>
+              <input type="tel" id="formNoHp" placeholder="08xxxxxxxxxx" class="w-full text-xs font-semibold px-3 py-2 rounded-xl soft-neu-inset border-0 text-slate-800 dark:text-slate-100">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Pekerjaan / Profesi</label>
+              <input type="text" id="formPekerjaan" placeholder="PNS, Dokter, Wiraswasta..." class="w-full text-xs font-semibold px-3 py-2 rounded-xl soft-neu-inset border-0 text-slate-800 dark:text-slate-100">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Alamat Domisili</label>
+            <input type="text" id="formAlamat" placeholder="Kota atau alamat lengkap" class="w-full text-xs font-semibold px-3 py-2 rounded-xl soft-neu-inset border-0 text-slate-800 dark:text-slate-100">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Catatan / Riwayat Hidup</label>
+            <textarea id="formKeterangan" rows="2" placeholder="Catatan makam jika wafat, gelar kehormatan, dll." class="w-full text-xs font-semibold px-3 py-2 rounded-xl soft-neu-inset border-0 text-slate-800 dark:text-slate-100"></textarea>
+          </div>
+        </div>
+
+        <div class="border-t border-slate-100 dark:border-slate-800 pt-3 flex justify-end space-x-2">
+          <button type="button" onclick="closeModal('memberModal')" class="px-4 py-2.5 rounded-xl text-slate-500 font-bold text-xs hover:bg-slate-100 dark:hover:bg-slate-800">Batal</button>
+          <button type="submit" id="btnSubmitMember" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-cyan-500 hover:from-brand-700 hover:to-cyan-600 text-white font-black text-xs flex items-center space-x-2 shadow-md shadow-brand-600/20 active:scale-95 transition">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <span>Simpan Anggota</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL AUTHENTICATION -->
+  <div id="authModal" style="display: none;" onclick="handleBackdropClick(event, 'authModal')" class="no-print fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div onclick="event.stopPropagation()" class="soft-neu rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4">
+      <div class="text-center">
+        <div class="w-12 h-12 rounded-2xl bg-brand-100 dark:bg-brand-950/60 text-brand-600 mx-auto flex items-center justify-center text-xl mb-3 soft-neu-sm">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <h3 class="font-black text-base text-slate-900 dark:text-white animated-menu-text">Otentikasi Pengguna</h3>
+        <p class="text-xs text-slate-400 mt-1">Masukkan PIN untuk mengelola data keluarga</p>
+      </div>
+
+      <form onsubmit="handleAuthLogin(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Username</label>
+          <input type="text" id="authInputUser" value="admin" required class="w-full text-xs font-semibold px-3.5 py-2.5 rounded-xl soft-neu-inset border-0 text-slate-800 dark:text-slate-100">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">PIN Rahasia</label>
+          <input type="password" id="authInputPin" value="123456" required class="w-full text-xs font-semibold px-3.5 py-2.5 rounded-xl soft-neu-inset border-0 text-slate-800 dark:text-slate-100">
+        </div>
+        <div id="authErrorMsg" class="text-xs text-rose-500 font-bold hidden text-center"></div>
+        <button type="submit" class="w-full py-3 rounded-2xl bg-gradient-to-r from-brand-600 to-cyan-500 hover:from-brand-700 hover:to-cyan-600 text-white font-black text-xs shadow-md shadow-brand-600/20 active:scale-95 transition">
+          Masuk Sekarang
+        </button>
+      </form>
+      <button onclick="closeModal('authModal')" class="w-full text-center text-xs text-slate-400 hover:text-slate-600">Batal</button>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toastContainer" class="no-print fixed top-4 sm:top-auto sm:bottom-5 right-4 sm:right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+  <script>
+    // In-memory application state
+    const GOOGLE_API_URL = 'https://script.google.com/macros/s/AKfycby-0M7XZa_x2brzVMeRmvDAfEOqMIhqVMKCC05ypw7WC5Qa_pyRYgiLLR5qudeNwBJ0/exec'; 
+
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const banner = document.getElementById('pwaInstallPromptBanner');
+      if (banner && !localStorage.getItem('pwa_dismissed')) {
+        banner.classList.remove('hidden');
+      }
+    });
+
+    function triggerPwaInstall() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            dismissInstallBanner();
+          }
+          deferredPrompt = null;
+        });
+      }
+    }
+
+    function dismissInstallBanner() {
+      const banner = document.getElementById('pwaInstallPromptBanner');
+      if (banner) banner.classList.add('hidden');
+      localStorage.setItem('pwa_dismissed', 'true');
+    }
+
+    // Register Dynamic Blob Service Worker for Standalone & Offline Caching
+    if ('serviceWorker' in navigator) {
+      const swCode = `
+        const CACHE_NAME = 'trah-enterprise-v1';
+        const ASSETS = [
+          'https://cdn.tailwindcss.com',
+          'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css'
+        ];
+
+        self.addEventListener('install', (e) => {
+          e.waitUntil(
+            caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)).then(() => self.skipWaiting())
+          );
+        });
+
+        self.addEventListener('activate', (e) => {
+          e.waitUntil(self.clients.claim());
+        });
+
+        self.addEventListener('fetch', (e) => {
+          if (e.request.method !== 'GET') return;
+          e.respondWith(
+            caches.match(e.request).then((res) => {
+              return res || fetch(e.request).then((netRes) => {
+                return caches.open(CACHE_NAME).then((cache) => {
+                  cache.put(e.request, netRes.clone());
+                  return netRes;
+                });
+              }).catch(() => caches.match(e.request));
+            })
+          );
+        });
+      `;
+      const blob = new Blob([swCode], { type: 'application/javascript' });
+      navigator.serviceWorker.register(URL.createObjectURL(blob)).catch((err) => {
+        console.warn('PWA ServiceWorker Notice:', err.message);
+      });
+    }
+
+    // IndexedDB Offline Queue Manager
+    const IDB_NAME = 'silsilah_enterprise_idb';
+    const IDB_STORE = 'sync_queue';
+    let dbInstance = null;
+
+    function initIndexedDB() {
+      return new Promise((resolve) => {
+        const req = indexedDB.open(IDB_NAME, 1);
+        req.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains(IDB_STORE)) {
+            db.createObjectStore(IDB_STORE, { keyPath: 'id', autoIncrement: true });
+          }
+        };
+        req.onsuccess = (e) => {
+          dbInstance = e.target.result;
+          resolve(dbInstance);
+        };
+        req.onerror = () => resolve(null);
+      });
+    }
+
+    async function queueOfflineMutation(action, payload) {
+      if (!dbInstance) await initIndexedDB();
+      if (!dbInstance) return;
+      const tx = dbInstance.transaction(IDB_STORE, 'readwrite');
+      const store = tx.objectStore(IDB_STORE);
+      store.add({ action, payload, timestamp: Date.now() });
+    }
+
+    async function flushOfflineSyncQueue() {
+      if (!navigator.onLine || !dbInstance) return;
+      const tx = dbInstance.transaction(IDB_STORE, 'readonly');
+      const store = tx.objectStore(IDB_STORE);
+      const req = store.getAll();
+      req.onsuccess = async () => {
+        const tasks = req.result || [];
+        if (tasks.length === 0) return;
+
+        showToast('Menyinkronkan ' + tasks.length + ' data antrean offline...', 'info');
+        for (const t of tasks) {
+          try {
+            await fetch(GOOGLE_API_URL, {
+              method: 'POST',
+              body: JSON.stringify({ action: t.action, payload: t.payload })
+            });
+          } catch (e) {
+            console.warn('Gagal sinkron antrean:', e);
+          }
+        }
+        // Clear synced items
+        const clrTx = dbInstance.transaction(IDB_STORE, 'readwrite');
+        clrTx.objectStore(IDB_STORE).clear();
+        reloadAllData(true);
+      };
+    }
+
+    window.addEventListener('online', () => {
+      document.getElementById('offlineIndicatorBanner').classList.add('hidden');
+      showToast('Koneksi internet kembali online!', 'success');
+      flushOfflineSyncQueue();
+    });
+
+    window.addEventListener('offline', () => {
+      document.getElementById('offlineIndicatorBanner').classList.remove('hidden');
+    });
+
+    const isGoogleAppsScriptContext = typeof google !== 'undefined' && google.script && google.script.run;
+    const isGoogleAppsScript = true;
+
+    if (!isGoogleAppsScriptContext) {
+      window.google = {
+        script: {
+          run: {
+            _success: null,
+            _failure: null,
+            withSuccessHandler: function(cb) {
+              const runner = Object.create(this);
+              runner._success = cb;
+              return runner;
+            },
+            withFailureHandler: function(cb) {
+              const runner = Object.create(this);
+              runner._failure = cb;
+              return runner;
+            },
+            _call: async function(action, payload) {
+              if (!navigator.onLine) {
+                await queueOfflineMutation(action, payload);
+                if (this._success) this._success({ success: true, offlineQueued: true, message: 'Data disimpan di antrean offline' });
+                return;
+              }
+              try {
+                if (!GOOGLE_API_URL || GOOGLE_API_URL.includes('MASUKKAN_URL')) {
+                  throw new Error("URL API belum disetel.");
+                }
+                const res = await fetch(GOOGLE_API_URL, { 
+                  method: 'POST', 
+                  body: JSON.stringify({action, payload}) 
+                });
+                const data = await res.json();
+                if (this._success) this._success(data);
+              } catch (e) {
+                if (!navigator.onLine) {
+                  await queueOfflineMutation(action, payload);
+                  if (this._success) this._success({ success: true, offlineQueued: true, message: 'Data disimpan offline' });
+                } else if (this._failure) {
+                  this._failure(e);
+                }
+              }
+            },
+            getInitialAppData: function() { this._call('getInitialAppData', {}); },
+            verifyUserLogin: function(username, pin) { this._call('verifyUserLogin', {username, pin}); },
+            saveMember: function(member, user) { this._call('saveMember', {member, user}); },
+            deleteMember: function(id, user) { this._call('deleteMember', {id, user}); },
+            saveFamilyProfile: function(config, user) { this._call('saveFamilyProfile', {config, user}); },
+            uploadMediaToDrive: function(params) { this._call('uploadMediaToDrive', params); },
+            backupDatabaseToDrive: function(user) { this._call('backupDatabaseToDrive', {user}); },
+            restoreDatabase: function(jsonContent, user) { this._call('restoreDatabase', {jsonContent, user}); }
+          }
+        }
+      };
+    }
+
+    // Default Seed Data
+    const initialDatabaseSeed = [
+      {
+        id: 'MEM-001', nama: 'Raden Mas Suryo Hadiningrat', nik: '3301010101500001', jenisKelamin: 'L',
+        tempatLahir: 'Yogyakarta', tanggalLahir: '1950-05-12', tanggalWafat: '2018-09-10', statusHidup: 'Wafat',
+        idAyah: '', idIbu: '', idPasangan: 'MEM-002', anakIds: ['MEM-003', 'MEM-004'],
+        alamat: 'Jl. Malioboro No. 12, Yogyakarta', noHp: '081234567890',
+        pekerjaan: 'Pensiunan Guru', keterangan: 'Sesepuh keluarga generasi pertama', fotoUrl: '', generasi: 1
+      },
+      {
+        id: 'MEM-002', nama: 'Raden Ayu Siti Aminah', nik: '3301010102550002', jenisKelamin: 'P',
+        tempatLahir: 'Solo', tanggalLahir: '1955-10-15', tanggalWafat: '', statusHidup: 'Hidup',
+        idAyah: '', idIbu: '', idPasangan: 'MEM-001', anakIds: ['MEM-003', 'MEM-004'],
+        alamat: 'Jl. Malioboro No. 12, Yogyakarta', noHp: '081234567891',
+        pekerjaan: 'Ibu Rumah Tangga', keterangan: 'Ibu Suri Trah Hadiningrat', fotoUrl: '', generasi: 1
+      },
+      {
+        id: 'MEM-003', nama: 'Bambang Tri Hadiningrat, S.T.', nik: '3301010103800003', jenisKelamin: 'L',
+        tempatLahir: 'Yogyakarta', tanggalLahir: '1980-03-14', tanggalWafat: '', statusHidup: 'Hidup',
+        idAyah: 'MEM-001', idIbu: 'MEM-002', idPasangan: 'MEM-005', anakIds: ['MEM-006', 'MEM-007'],
+        alamat: 'Jakarta Selatan', noHp: '081398765432',
+        pekerjaan: 'Arsitek', keterangan: 'Putra sulung keluarga Hadiningrat', fotoUrl: '', generasi: 2
+      },
+      {
+        id: 'MEM-004', nama: 'Dra. Endang Lestari', nik: '3301010104850004', jenisKelamin: 'P',
+        tempatLahir: 'Yogyakarta', tanggalLahir: '1985-11-22', tanggalWafat: '', statusHidup: 'Hidup',
+        idAyah: 'MEM-001', idIbu: 'MEM-002', idPasangan: '', anakIds: [],
+        alamat: 'Surabaya Barat', noHp: '081512345678',
+        pekerjaan: 'Dosen', keterangan: 'Putri kedua', fotoUrl: '', generasi: 2
+      },
+      {
+        id: 'MEM-005', nama: 'dr. Ratna Kusumawardani, Sp.A', nik: '3201010105820005', jenisKelamin: 'P',
+        tempatLahir: 'Bandung', tanggalLahir: '1982-10-18', tanggalWafat: '', statusHidup: 'Hidup',
+        idAyah: '', idIbu: '', idPasangan: 'MEM-003', anakIds: ['MEM-006', 'MEM-007'],
+        alamat: 'Jakarta Selatan', noHp: '081787654321',
+        pekerjaan: 'Dokter Spesialis Anak', keterangan: 'Menantu, Istri Bambang', fotoUrl: '', generasi: 2
+      },
+      {
+        id: 'MEM-006', nama: 'Aria Daniswara Hadiningrat', nik: '', jenisKelamin: 'L',
+        tempatLahir: 'Jakarta', tanggalLahir: '2010-04-18', tanggalWafat: '', statusHidup: 'Hidup',
+        idAyah: 'MEM-003', idIbu: 'MEM-005', idPasangan: '', anakIds: [],
+        alamat: 'Jakarta Selatan', noHp: '081299887766',
+        pekerjaan: 'Pelajar SMA', keterangan: 'Cucu pertama putra', fotoUrl: '', generasi: 3
+      },
+      {
+        id: 'MEM-007', nama: 'Clarissa Kirana Hadiningrat', nik: '', jenisKelamin: 'P',
+        tempatLahir: 'Jakarta', tanggalLahir: '2015-12-05', tanggalWafat: '', statusHidup: 'Hidup',
+        idAyah: 'MEM-003', idIbu: 'MEM-005', idPasangan: '', anakIds: [],
+        alamat: 'Jakarta Selatan', noHp: '',
+        pekerjaan: 'Pelajar SD', keterangan: 'Cucu kedua putri', fotoUrl: '', generasi: 3
+      }
+    ];
+
+    let appState = {
+      currentUser: { username: 'admin', nama: 'Administrator Utama', role: 'admin' },
+      config: {
+        namaKeluarga: 'Keluarga Besar Trah Hadiningrat',
+        motto: 'Guyub Rukun Mbangun Katentreman',
+        deskripsi: 'Sistem arsip silsilah resmi digital berbasis cloud Google Workspace.'
+      },
+      members: JSON.parse(JSON.stringify(initialDatabaseSeed)),
+      stats: {},
+      currentViewMode: 'grid',
+      currentTab: 'dashboard',
+      previousTab: null,
+      treeZoom: 1,
+      treePan: { x: 20, y: 20 },
+      isDraggingTree: false,
+      dragStart: { x: 0, y: 0 }
+    };
+
+    const INDO_MONTHS = [
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      await initIndexedDB();
+      appState.stats = calculateStatsClient(appState.members);
+      initTheme();
+      initTreeInteractivity();
+      initGlobalShortcuts();
+      renderAllViews();
+      reloadAllData();
+      window.addEventListener('resize', () => {
+        if (appState.currentTab === 'tree') drawTreeConnections();
+      });
+      if (navigator.onLine) {
+        flushOfflineSyncQueue();
+      }
+    });
+
+    function initGlobalShortcuts() {
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          ['mobileMoreDrawer', 'detailModal', 'memberModal', 'authModal'].forEach(id => closeModal(id));
+          const mobileDrawer = document.getElementById('mobileSearchDrawer');
+          if (mobileDrawer) {
+            mobileDrawer.style.display = 'none';
+            mobileDrawer.classList.add('hidden');
+          }
+        }
+      });
+    }
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem('silsilah_theme');
+      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        updateThemeIcon(true);
+      } else {
+        document.documentElement.classList.remove('dark');
+        updateThemeIcon(false);
+      }
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('silsilah_theme', isDark ? 'dark' : 'light');
+      updateThemeIcon(isDark);
+    }
+
+    function updateThemeIcon(isDark) {
+      const icon = document.getElementById('themeIcon');
+      if (icon) {
+        icon.className = isDark ? 'fa-solid fa-sun text-amber-400 text-xs sm:text-sm' : 'fa-solid fa-moon text-xs sm:text-sm';
+      }
+    }
+
+    function toggleMobileSearchBar() {
+      const drawer = document.getElementById('mobileSearchDrawer');
+      if (!drawer) return;
+      if (drawer.style.display === 'none' || drawer.classList.contains('hidden')) {
+        drawer.style.display = 'block';
+        drawer.classList.remove('hidden');
+        const input = document.getElementById('mobileSearchInput');
+        if (input) input.focus();
+      } else {
+        drawer.style.display = 'none';
+        drawer.classList.add('hidden');
+      }
+    }
+
+    function toggleMobileMoreMenu() {
+      openModal('mobileMoreDrawer');
+    }
+
+    function handleTopBackAction() {
+      if (appState.previousTab) {
+        switchTab(appState.previousTab);
+        appState.previousTab = null;
+      } else {
+        switchTab('dashboard');
+      }
+    }
+
+    function quickAddAction() { closeModal('mobileMoreDrawer'); openMemberModal(); }
+    function quickTreeAction() { closeModal('mobileMoreDrawer'); switchTab('tree'); }
+    function quickBirthdayAction() { closeModal('mobileMoreDrawer'); switchTab('birthdays'); }
+    function quickSearchAction() {
+      closeModal('mobileMoreDrawer');
+      switchTab('members');
+      setTimeout(() => {
+        const input = document.getElementById('memberFilterSearch');
+        if (input) { input.focus(); input.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+      }, 120);
+    }
+    function quickReportAction() { closeModal('mobileMoreDrawer'); switchTab('reports'); }
+    function quickBackupAction() { closeModal('mobileMoreDrawer'); switchTab('backup'); }
+    function quickSyncAction() { closeModal('mobileMoreDrawer'); reloadAllData(true); }
+    function quickSettingsAction() { closeModal('mobileMoreDrawer'); switchTab('settings'); }
+
+    function switchTab(tabId) {
+      if (appState.currentTab !== tabId) {
+        appState.previousTab = appState.currentTab;
+      }
+      appState.currentTab = tabId;
+
+      document.querySelectorAll('.tab-content').forEach(el => {
+        el.style.display = 'none';
+        el.classList.add('hidden');
+        el.classList.remove('flex', 'block');
+      });
+
+      document.querySelectorAll('.sidebar-item').forEach(el => {
+        el.className = 'sidebar-item w-full flex items-center space-x-3.5 px-4 py-3.5 rounded-2xl font-bold text-xs transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800/50';
+        const label = el.querySelector('.menu-label-text');
+        if (label) label.classList.remove('animated-menu-text');
+      });
+
+      document.querySelectorAll('.bnav-btn').forEach(el => {
+        el.className = 'bnav-btn flex flex-col items-center justify-center py-1 transition-all duration-150 text-slate-500 dark:text-slate-400';
+        const iconWrap = el.querySelector('div');
+        if (iconWrap) {
+          iconWrap.className = 'w-10 h-7 rounded-full flex items-center justify-center transition-all';
+        }
+        const label = el.querySelector('.menu-label-text');
+        if (label) label.classList.remove('animated-menu-text');
+      });
+
+      const activeTabEl = document.getElementById('tab-' + tabId);
+      if (activeTabEl) {
+        activeTabEl.classList.remove('hidden');
+        if (tabId === 'tree') {
+          activeTabEl.style.display = 'flex';
+          activeTabEl.classList.add('flex');
+        } else {
+          activeTabEl.style.display = 'block';
+          activeTabEl.classList.add('block');
+        }
+      }
+
+      const activeSidebarNav = document.getElementById('sidebar-nav-' + tabId);
+      if (activeSidebarNav) {
+        activeSidebarNav.className = 'sidebar-item w-full flex items-center space-x-3.5 px-4 py-3.5 rounded-2xl font-black text-xs transition-all text-brand-700 bg-brand-50 dark:bg-brand-900/30 dark:text-brand-300 shadow-sm border border-brand-200/50 dark:border-brand-800/50';
+        const label = activeSidebarNav.querySelector('.menu-label-text');
+        if (label) label.classList.add('animated-menu-text');
+      }
+
+      let targetBnavId = 'bnav-' + tabId;
+      if (['birthdays', 'reports', 'backup', 'settings'].includes(tabId)) {
+        targetBnavId = 'bnav-more';
+      }
+
+      const activeBnav = document.getElementById(targetBnavId);
+      if (activeBnav) {
+        activeBnav.className = 'bnav-btn flex flex-col items-center justify-center py-1 transition-all duration-150 text-brand-600 dark:text-brand-400';
+        const iconWrap = activeBnav.querySelector('div');
+        if (iconWrap) {
+          iconWrap.className = 'w-10 h-7 rounded-full flex items-center justify-center transition-all bg-brand-100/80 dark:bg-brand-900/50 soft-neu-sm text-brand-600 dark:text-brand-400';
+        }
+        const label = activeBnav.querySelector('.menu-label-text');
+        if (label) label.classList.add('animated-menu-text');
+      }
+
+      const titles = {
+        dashboard: 'Dasbor Keluarga',
+        tree: 'Pohon Silsilah Visual',
+        members: 'Daftar Anggota',
+        birthdays: 'Kalender Ulang Tahun',
+        reports: 'Laporan & Cetak',
+        backup: 'Pencadangan & Drive',
+        settings: 'Pengaturan Trah'
+      };
+      const titleEl = document.getElementById('topBarTitle');
+      titleEl.textContent = titles[tabId] || 'Silsilah Keluarga';
+      titleEl.classList.add('animated-menu-text');
+
+      const backBtn = document.getElementById('topBarBackBtn');
+      const logoIcon = document.getElementById('topBarLogoIcon');
+      if (tabId !== 'dashboard') {
+        backBtn.classList.remove('hidden');
+        logoIcon.classList.add('hidden');
+      } else {
+        backBtn.classList.add('hidden');
+        logoIcon.classList.remove('hidden');
+      }
+
+      if (tabId === 'tree') {
+        setTimeout(renderFamilyTree, 60);
+      } else if (tabId === 'birthdays') {
+        renderBirthdayFullCalendar();
+      } else if (tabId === 'reports') {
+        renderReportView();
+      }
+    }
+
+    function reloadAllData(showNotification = false) {
+      const syncBtn = document.getElementById('syncButton');
+      if (syncBtn) syncBtn.classList.add('animate-spin');
+
+      if (isGoogleAppsScript) {
+        google.script.run
+          .withSuccessHandler(res => {
+            if (syncBtn) syncBtn.classList.remove('animate-spin');
+            if (res && res.success && res.data) {
+              if (res.data.members && res.data.members.length > 0) appState.members = res.data.members;
+              if (res.data.config) appState.config = { ...appState.config, ...res.data.config };
+              appState.stats = res.data.stats || calculateStatsClient(appState.members);
+              renderAllViews();
+              if (showNotification) showToast('Data tersinkronisasi otomatis dengan Google Sheets!', 'success');
+            }
+          })
+          .withFailureHandler(err => {
+            if (syncBtn) syncBtn.classList.remove('animate-spin');
+            appState.stats = calculateStatsClient(appState.members);
+            renderAllViews();
+            if (showNotification) showToast('Mode Lokal / Offline aktif', 'info');
+          })
+          .getInitialAppData();
+      }
+    }
+
+    function calculateStatsClient(members) {
+      let pria = 0, wanita = 0, hidup = 0, wafat = 0;
+      const genSet = new Set();
+      members.forEach(m => {
+        if (!m) return;
+        if (m.jenisKelamin === 'L') pria++;
+        if (m.jenisKelamin === 'P') wanita++;
+        if (m.statusHidup === 'Wafat') wafat++; else hidup++;
+        if (m.generasi) genSet.add(Number(m.generasi));
+      });
+      return {
+        totalAnggota: members.length,
+        totalPria: pria,
+        totalWanita: wanita,
+        totalHidup: hidup,
+        totalWafat: wafat,
+        totalGenerasi: genSet.size || 1
+      };
+    }
+
+    function renderAllViews() {
+      const familyName = appState.config.namaKeluarga || 'Keluarga Besar';
+      document.getElementById('brandFamilyNameDesktop').textContent = familyName;
+      document.getElementById('dashHeroTitle').textContent = 'Selamat Datang di ' + familyName;
+      document.getElementById('topBarSubtitle').textContent = appState.config.motto || '';
+      document.getElementById('dashHeroDesc').textContent = appState.config.deskripsi || '';
+
+      const st = appState.stats;
+      document.getElementById('statTotal').textContent = st.totalAnggota || appState.members.length;
+      document.getElementById('statGenerasi').textContent = st.totalGenerasi || 1;
+      document.getElementById('statGenderRatio').textContent = `${st.totalPria || 0} / ${st.totalWanita || 0}`;
+      document.getElementById('statLifeRatio').textContent = `${st.totalHidup || 0} / ${st.totalWafat || 0}`;
+
+      renderDashboardWidgets();
+      renderUpcomingBirthdaysWidget();
+
+      populateFormMemberOptions();
+      filterMemberList();
+      populateTreeRootOptions();
+      if (appState.currentTab === 'tree') renderFamilyTree();
+      if (appState.currentTab === 'birthdays') renderBirthdayFullCalendar();
+      if (appState.currentTab === 'reports') renderReportView();
+
+      document.getElementById('settingNamaKeluarga').value = appState.config.namaKeluarga || '';
+      document.getElementById('settingMotto').value = appState.config.motto || '';
+      document.getElementById('settingDeskripsi').value = appState.config.deskripsi || '';
+    }
+
+    function renderDashboardWidgets() {
+      const ancestors = appState.members.filter(m => Number(m.generasi) === 1);
+      const ancestorsContainer = document.getElementById('ancestorsList');
+      if (ancestorsContainer) {
+        if (ancestors.length === 0) {
+          ancestorsContainer.innerHTML = `<p class="text-xs text-slate-400 italic">Belum ada data generasi pertama.</p>`;
+        } else {
+          ancestorsContainer.innerHTML = ancestors.slice(0, 4).map(m => `
+            <div onclick="showMemberDetail('${m.id}')" class="flex items-center justify-between p-2.5 rounded-2xl soft-neu-inset hover:opacity-90 active:scale-[0.99] cursor-pointer transition">
+              <div class="flex items-center space-x-3 overflow-hidden">
+                <div class="w-10 h-10 rounded-xl ${m.jenisKelamin === 'L' ? 'bg-sky-100 dark:bg-sky-950 text-sky-600' : 'bg-rose-100 dark:bg-rose-950 text-rose-600'} flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden shadow-sm">
+                  ${m.fotoUrl ? `<img src="${m.fotoUrl}" class="w-full h-full object-cover">` : getInitials(m.nama)}
+                </div>
+                <div class="truncate">
+                  <h4 class="font-bold text-xs text-slate-800 dark:text-slate-100 truncate">${m.nama}</h4>
+                  <p class="text-[10px] text-slate-400 truncate">${m.pekerjaan || 'Generasi 1'} • ${m.statusHidup}</p>
+                </div>
+              </div>
+              <span class="text-[10px] font-black px-2 py-0.5 rounded-lg shrink-0 ${m.statusHidup === 'Wafat' ? 'bg-slate-200 dark:bg-slate-800 text-slate-500' : 'bg-brand-100 dark:bg-brand-950 text-brand-600'}">${m.statusHidup}</span>
+            </div>
+          `).join('');
+        }
+      }
+
+      const recent = [...appState.members].slice(-4).reverse();
+      const recentContainer = document.getElementById('recentMembersList');
+      if (recentContainer) {
+        recentContainer.innerHTML = recent.map(m => `
+          <div onclick="showMemberDetail('${m.id}')" class="flex items-center justify-between p-2.5 rounded-2xl soft-neu-inset hover:opacity-90 active:scale-[0.99] cursor-pointer transition">
+            <div class="flex items-center space-x-3 overflow-hidden">
+              <div class="w-10 h-10 rounded-xl ${m.jenisKelamin === 'L' ? 'bg-blue-100 dark:bg-blue-950 text-blue-600' : 'bg-pink-100 dark:bg-pink-950 text-pink-600'} flex items-center justify-center font-bold text-xs shrink-0 overflow-hidden shadow-sm">
+                ${m.fotoUrl ? `<img src="${m.fotoUrl}" class="w-full h-full object-cover">` : getInitials(m.nama)}
+              </div>
+              <div class="truncate">
+                <h4 class="font-bold text-xs text-slate-800 dark:text-slate-100 truncate">${m.nama}</h4>
+                <p class="text-[10px] text-slate-400 truncate">Gen ${m.generasi || 1} • ${m.tempatLahir || 'Indonesia'}</p>
+              </div>
+            </div>
+            <i class="fa-solid fa-chevron-right text-slate-400 text-xs"></i>
+          </div>
+        `).join('');
+      }
+    }
+
+    function getParsedBirthdayDetails(member, refDate = new Date()) {
+      if (!member || !member.tanggalLahir) return null;
+      const bDate = new Date(member.tanggalLahir);
+      if (isNaN(bDate.getTime())) return null;
+
+      const birthMonth = bDate.getMonth();
+      const birthDay = bDate.getDate();
+      const birthYear = bDate.getFullYear();
+
+      const currentYear = refDate.getFullYear();
+      let nextBday = new Date(currentYear, birthMonth, birthDay);
+      
+      const todayZero = new Date(refDate.getFullYear(), refDate.getMonth(), refDate.getDate());
+      let targetYear = currentYear;
+      if (nextBday < todayZero) {
+        targetYear = currentYear + 1;
+        nextBday = new Date(targetYear, birthMonth, birthDay);
+      }
+
+      const diffTime = nextBday - todayZero;
+      const daysRemaining = Math.round(diffTime / (1000 * 60 * 60 * 24));
+      const turningAge = targetYear - birthYear;
+
+      return {
+        member, birthMonth, birthDay, birthYear, nextBday,
+        daysRemaining, turningAge,
+        formattedBday: `${birthDay} ${INDO_MONTHS[birthMonth]}`
+      };
+    }
+
+    function renderUpcomingBirthdaysWidget() {
+      const container = document.getElementById('dashUpcomingBirthdaysList');
+      if (!container) return;
+
+      const now = new Date();
+      const bdayList = [];
+
+      appState.members.forEach(m => {
+        if (!m || m.statusHidup === 'Wafat') return;
+        const detail = getParsedBirthdayDetails(m, now);
+        if (detail && detail.daysRemaining <= 45) {
+          bdayList.push(detail);
+        }
+      });
+
+      bdayList.sort((a, b) => a.daysRemaining - b.daysRemaining);
+
+      const sideBadge = document.getElementById('sidebarBirthdayBadge');
+      const mobBadge = document.getElementById('mobileMoreBadge');
+      if (bdayList.length > 0) {
+        if (sideBadge) { sideBadge.textContent = bdayList.length; sideBadge.classList.remove('hidden'); }
+        if (mobBadge) mobBadge.classList.remove('hidden');
+      } else {
+        if (sideBadge) sideBadge.classList.add('hidden');
+        if (mobBadge) mobBadge.classList.add('hidden');
+      }
+
+      if (bdayList.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full p-4 rounded-2xl soft-neu-inset text-center text-xs text-slate-400">
+            <i class="fa-solid fa-gift text-lg text-pink-400 mb-1 block"></i>
+            Tidak ada ulang tahun dalam 45 hari kedepan.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = bdayList.slice(0, 3).map(item => {
+        const m = item.member;
+        const isToday = item.daysRemaining === 0;
+        const isTomorrow = item.daysRemaining === 1;
+
+        let badgeText = `${item.daysRemaining} hari lagi`;
+        let badgeColor = 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300';
+        if (isToday) {
+          badgeText = 'Hari Ini!';
+          badgeColor = 'bg-pink-500 text-white animate-bounce';
+        } else if (isTomorrow) {
+          badgeText = 'Besok';
+          badgeColor = 'bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-300';
+        }
+
+        const waUrl = generateWhatsAppWishUrl(m, item.turningAge);
+
+        return `
+          <div class="soft-neu-sm p-3.5 rounded-2xl flex flex-col justify-between space-y-3 transition hover:shadow-md">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center space-x-3 overflow-hidden">
+                <div class="w-11 h-11 rounded-2xl ${m.jenisKelamin === 'L' ? 'bg-sky-100 text-sky-600 dark:bg-sky-950' : 'bg-pink-100 text-pink-600 dark:bg-pink-950'} flex items-center justify-center font-black text-xs shrink-0 overflow-hidden soft-neu-inset">
+                  ${m.fotoUrl ? `<img src="${m.fotoUrl}" class="w-full h-full object-cover">` : getInitials(m.nama)}
+                </div>
+                <div class="truncate">
+                  <h4 class="font-black text-xs text-slate-800 dark:text-slate-100 truncate">${m.nama}</h4>
+                  <p class="text-[10px] text-pink-600 dark:text-pink-400 font-bold">${item.formattedBday} • Ultah ke-${item.turningAge}</p>
+                </div>
+              </div>
+              <span class="text-[9px] font-black px-2 py-0.5 rounded-lg shrink-0 ${badgeColor}">${badgeText}</span>
+            </div>
+
+            <div class="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-800/80">
+              <button onclick="showMemberDetail('${m.id}')" class="text-[11px] font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-200">Lihat Profil</button>
+              ${m.noHp && m.noHp !== '-' ? `
+                <a href="${waUrl}" target="_blank" class="px-2.5 py-1 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-black text-[10px] flex items-center space-x-1.5 shadow-sm active:scale-95 transition">
+                  <i class="fa-brands fa-whatsapp text-xs"></i>
+                  <span>Beri Ucapan</span>
+                </a>
+              ` : `<span class="text-[10px] text-slate-400 italic">No WA belum ada</span>`}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderBirthdayFullCalendar() {
+      const container = document.getElementById('birthdayCalendarCardsContainer');
+      if (!container) return;
+
+      const monthFilter = document.getElementById('birthdayMonthFilter').value;
+      const statusFilter = document.getElementById('birthdayStatusFilter').value;
+      const searchQ = (document.getElementById('birthdaySearchInput').value || '').toLowerCase().trim();
+
+      const now = new Date();
+      let allBirthdays = [];
+
+      appState.members.forEach(m => {
+        if (!m) return;
+        if (statusFilter === 'Hidup' && m.statusHidup === 'Wafat') return;
+        const detail = getParsedBirthdayDetails(m, now);
+        if (!detail) return;
+        if (searchQ && !m.nama.toLowerCase().includes(searchQ)) return;
+        allBirthdays.push(detail);
+      });
+
+      if (allBirthdays.length === 0) {
+        container.innerHTML = `
+          <div class="soft-neu p-8 rounded-3xl text-center text-slate-400 text-xs font-semibold">
+            <i class="fa-solid fa-cake-candles text-2xl text-pink-400 mb-2 block"></i>
+            Tidak ada data tanggal lahir yang sesuai dengan filter.
+          </div>
+        `;
+        return;
+      }
+
+      if (monthFilter === 'UPCOMING_30') {
+        allBirthdays = allBirthdays.filter(item => item.daysRemaining <= 30);
+        allBirthdays.sort((a, b) => a.daysRemaining - b.daysRemaining);
+
+        if (allBirthdays.length === 0) {
+          container.innerHTML = `
+            <div class="soft-neu p-8 rounded-3xl text-center text-slate-400 text-xs font-semibold">
+              <i class="fa-solid fa-calendar-check text-2xl text-pink-400 mb-2 block"></i>
+              Tidak ada hari ulang tahun dalam 30 hari kedepan.
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = `
+          <div class="soft-neu rounded-3xl p-5 space-y-4">
+            <div class="flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-pink-500 animate-ping"></span>
+              <h4 class="font-black text-xs sm:text-sm animated-menu-text">Daftar Terdekat (30 Hari Kedepan)</h4>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+              ${allBirthdays.map(item => createBirthdayCardHtml(item)).join('')}
+            </div>
+          </div>
+        `;
+      } else {
+        const monthGroups = {};
+        for (let i = 0; i < 12; i++) monthGroups[i] = [];
+        allBirthdays.forEach(item => { monthGroups[item.birthMonth].push(item); });
+        for (let i = 0; i < 12; i++) { monthGroups[i].sort((a, b) => a.birthDay - b.birthDay); }
+
+        let monthsToDisplay = monthFilter === 'ALL' ? [0,1,2,3,4,5,6,7,8,9,10,11] : [Number(monthFilter)];
+
+        container.innerHTML = monthsToDisplay.map(mIdx => {
+          const items = monthGroups[mIdx];
+          const isCurrentMonth = now.getMonth() === mIdx;
+
+          return `
+            <div class="soft-neu rounded-3xl p-4 sm:p-6 space-y-3.5">
+              <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                <div class="flex items-center space-x-3">
+                  <div class="w-9 h-9 rounded-2xl ${isCurrentMonth ? 'bg-pink-500 text-white birthday-glow' : 'soft-neu-sm text-pink-600'} flex items-center justify-center font-black text-xs shadow-sm">
+                    ${mIdx + 1}
+                  </div>
+                  <div>
+                    <h4 class="font-black text-sm sm:text-base text-slate-900 dark:text-white flex items-center space-x-2">
+                      <span class="${isCurrentMonth ? 'animated-menu-text' : ''}">Bulan ${INDO_MONTHS[mIdx]}</span>
+                      ${isCurrentMonth ? '<span class="text-[9px] font-black bg-pink-100 text-pink-700 dark:bg-pink-950 dark:text-pink-300 px-2 py-0.5 rounded-full">Bulan Ini</span>' : ''}
+                    </h4>
+                    <p class="text-[10px] text-slate-400">${items.length} anggota lahir di bulan ini</p>
+                  </div>
+                </div>
+              </div>
+
+              ${items.length === 0 ? `
+                <p class="text-xs text-slate-400 italic py-2">Belum ada anggota yang lahir di bulan ${INDO_MONTHS[mIdx]}.</p>
+              ` : `
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                  ${items.map(item => createBirthdayCardHtml(item)).join('')}
+                </div>
+              `}
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function createBirthdayCardHtml(item) {
+      const m = item.member;
+      const isDead = m.statusHidup === 'Wafat';
+      const isToday = item.daysRemaining === 0 && !isDead;
+      const isTomorrow = item.daysRemaining === 1 && !isDead;
+
+      let badgeHtml = '';
+      if (isDead) {
+        badgeHtml = `<span class="text-[9px] font-bold px-2 py-0.5 rounded-md bg-slate-200 dark:bg-slate-800 text-slate-500">Mengenang (Haul)</span>`;
+      } else if (isToday) {
+        badgeHtml = `<span class="text-[9px] font-black px-2 py-0.5 rounded-md bg-pink-500 text-white animate-pulse">HARI INI!</span>`;
+      } else if (isTomorrow) {
+        badgeHtml = `<span class="text-[9px] font-bold px-2 py-0.5 rounded-md bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300">Besok</span>`;
+      } else {
+        badgeHtml = `<span class="text-[9px] font-medium px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500">${item.daysRemaining} hari lagi</span>`;
+      }
+
+      const waUrl = !isDead ? generateWhatsAppWishUrl(m, item.turningAge) : null;
+
+      return `
+        <div class="soft-neu-sm p-3.5 rounded-2xl flex flex-col justify-between space-y-3 hover:border-pink-200 transition">
+          <div>
+            <div class="flex items-start justify-between">
+              <div class="w-12 h-12 rounded-2xl ${m.jenisKelamin === 'L' ? 'bg-sky-100 text-sky-600 dark:bg-sky-950' : 'bg-pink-100 text-pink-600 dark:bg-pink-950'} flex items-center justify-center font-black text-xs shrink-0 overflow-hidden soft-neu-inset">
+                ${m.fotoUrl ? `<img src="${m.fotoUrl}" class="w-full h-full object-cover">` : getInitials(m.nama)}
+              </div>
+              ${badgeHtml}
+            </div>
+
+            <h4 class="font-black text-xs sm:text-sm text-slate-900 dark:text-white mt-2.5 truncate">${m.nama}</h4>
+            <p class="text-[11px] font-bold text-pink-600 dark:text-pink-400 mt-0.5">
+              ${item.formattedBday} ${item.birthYear ? `(${item.birthYear})` : ''}
+            </p>
+            <p class="text-[10px] text-slate-400">
+              ${isDead ? `Haul / Lahir ${item.turningAge} th lalu` : `Ulang tahun ke-${item.turningAge}`} • Gen ${m.generasi || 1}
+            </p>
+          </div>
+
+          <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+            <button onclick="showMemberDetail('${m.id}')" class="text-[10px] font-bold text-slate-500 hover:underline">Profil</button>
+            ${waUrl && m.noHp && m.noHp !== '-' ? `
+              <a href="${waUrl}" target="_blank" class="px-2.5 py-1 rounded-xl bg-gradient-to-r from-brand-500 to-cyan-500 text-white font-black text-[10px] flex items-center space-x-1 shadow-sm active:scale-95 transition">
+                <i class="fa-brands fa-whatsapp"></i>
+                <span>WA Ucapan</span>
+              </a>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    function generateWhatsAppWishUrl(member, age) {
+      if (!member.noHp || member.noHp === '-') return '#';
+      let phone = member.noHp.replace(/[^0-9]/g, '');
+      if (phone.startsWith('0')) phone = '62' + phone.substring(1);
+
+      const familyName = appState.config.namaKeluarga || 'Keluarga Besar';
+      const text = `Assalamu'alaikum / Salam hangat ${member.nama},\n\nSelamat Ulang Tahun yang ke-${age}! 🎂🎉\nSemoga senantiasa diberikan kesehatan, umur berkah, kemudahan rezeki, dan kebahagiaan.\n\nSalam guyub rukun dari ${familyName}.`;
+      return `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
+    }
+
+    function populateTreeRootOptions() {
+      const selector = document.getElementById('treeRootSelector');
+      if (!selector) return;
+
+      const currentVal = selector.value;
+      selector.innerHTML = '';
+
+      const optAll = document.createElement('option');
+      optAll.value = 'ALL';
+      optAll.textContent = 'Semua Garis Silsilah';
+      selector.appendChild(optAll);
+
+      appState.members.forEach(m => {
+        if (!m) return;
+        const opt = document.createElement('option');
+        opt.value = m.id;
+        opt.textContent = `Gen ${m.generasi || 1} - ${m.nama}`;
+        selector.appendChild(opt);
+      });
+
+      if (currentVal) selector.value = currentVal;
+    }
+
+    function getDescendantIds(rootId, members) {
+      const result = new Set([rootId]);
+      let added = true;
+      while (added) {
+        added = false;
+        members.forEach(m => {
+          if (m.idAyah && result.has(m.idAyah) && !result.has(m.id)) { result.add(m.id); added = true; }
+          if (m.idIbu && result.has(m.idIbu) && !result.has(m.id)) { result.add(m.id); added = true; }
+          if (m.idPasangan && result.has(m.idPasangan) && !result.has(m.id)) { result.add(m.id); added = true; }
+        });
+      }
+      return result;
+    }
+
+    function renderFamilyTree() {
+      const container = document.getElementById('treeNodesContainer');
+      const svg = document.getElementById('treeConnectionsSvg');
+      const rootSelector = document.getElementById('treeRootSelector');
+      if (!container || !svg) return;
+
+      container.innerHTML = '';
+      svg.innerHTML = '';
+
+      const rootFilter = rootSelector ? rootSelector.value : 'ALL';
+      let activeTreeMembers = appState.members;
+
+      if (rootFilter && rootFilter !== 'ALL') {
+        const allowedIds = getDescendantIds(rootFilter, appState.members);
+        activeTreeMembers = appState.members.filter(m => allowedIds.has(m.id));
+      }
+
+      const genMap = {};
+      activeTreeMembers.forEach(m => {
+        if (!m) return;
+        const gen = Number(m.generasi) || 1;
+        if (!genMap[gen]) genMap[gen] = [];
+        genMap[gen].push(m);
+      });
+
+      const generations = Object.keys(genMap).map(Number).sort((a, b) => a - b);
+
+      if (generations.length === 0) {
+        container.innerHTML = `<div class="p-12 text-center text-slate-400 text-xs font-semibold">Belum ada data silsilah untuk ditampilkan.</div>`;
+        return;
+      }
+
+      generations.forEach(gen => {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'flex flex-col items-center mb-16 relative';
+
+        const genBadge = document.createElement('div');
+        genBadge.className = 'text-[10px] font-black uppercase tracking-widest mb-5 bg-brand-50 dark:bg-brand-950/70 px-4 py-1.5 rounded-full border border-brand-200/60 dark:border-brand-800/60 soft-neu-sm animated-menu-text';
+        genBadge.textContent = `Generasi Ke-${gen}`;
+        rowDiv.appendChild(genBadge);
+
+        const membersRow = document.createElement('div');
+        membersRow.className = 'flex flex-wrap items-center justify-center gap-6 sm:gap-8';
+
+        genMap[gen].forEach(member => {
+          membersRow.appendChild(createTreeNodeCard(member));
+        });
+
+        rowDiv.appendChild(membersRow);
+        container.appendChild(rowDiv);
+      });
+
+      requestAnimationFrame(drawTreeConnections);
+    }
+
+    function createTreeNodeCard(member) {
+      const card = document.createElement('div');
+      card.id = `tree-node-${member.id}`;
+      card.className = `relative p-3.5 rounded-3xl soft-neu transition-all duration-150 active:scale-95 cursor-pointer w-52 sm:w-56 select-none ${
+        member.jenisKelamin === 'L' ? 'ring-2 ring-sky-300/60 dark:ring-sky-700/40' : 'ring-2 ring-pink-300/60 dark:ring-pink-700/40'
+      }`;
+
+      const spouse = member.idPasangan ? appState.members.find(m => m.id === member.idPasangan) : null;
+
+      card.innerHTML = `
+        <div class="flex items-center space-x-3" onclick="showMemberDetail('${member.id}')">
+          <div class="w-12 h-12 rounded-2xl ${member.jenisKelamin === 'L' ? 'bg-sky-100 dark:bg-sky-950 text-sky-600' : 'bg-pink-100 dark:bg-pink-950 text-pink-600'} flex items-center justify-center font-black text-xs shrink-0 overflow-hidden soft-neu-inset">
+            ${member.fotoUrl ? `<img src="${member.fotoUrl}" class="w-full h-full object-cover">` : getInitials(member.nama)}
+          </div>
+          <div class="truncate flex-1">
+            <h4 class="font-black text-xs text-slate-800 dark:text-slate-100 truncate">${member.nama}</h4>
+            <p class="text-[10px] text-slate-400 truncate">${member.pekerjaan || (member.jenisKelamin === 'L' ? 'Laki-laki' : 'Perempuan')}</p>
+            <div class="flex items-center space-x-1.5 mt-1">
+              <span class="text-[9px] px-1.5 py-0.2 rounded-md font-bold ${member.statusHidup === 'Wafat' ? 'bg-slate-200 dark:bg-slate-800 text-slate-500' : 'bg-brand-100 dark:bg-brand-900/50 text-brand-600'}">
+                ${member.statusHidup}
+              </span>
+              <span class="text-[9px] text-slate-400 font-bold">G${member.generasi || 1}</span>
+            </div>
+          </div>
+        </div>
+
+        ${spouse ? `
+          <div class="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px]">
+            <span class="flex items-center space-x-1 text-rose-500 font-bold truncate max-w-[130px]">
+              <i class="fa-solid fa-ring text-[9px]"></i>
+              <span class="truncate">${spouse.nama}</span>
+            </span>
+            <button onclick="event.stopPropagation(); showMemberDetail('${spouse.id}')" title="Lihat Pasangan" class="text-slate-400 hover:text-slate-600">
+              <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+            </button>
+          </div>
+        ` : ''}
+
+        <div class="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center text-[10px]">
+          <span class="text-slate-400 font-medium">${Array.isArray(member.anakIds) ? member.anakIds.length : 0} Anak</span>
+          <button onclick="event.stopPropagation(); openAddChildModal('${member.id}')" class="text-brand-600 dark:text-brand-400 font-black hover:underline">
+            + Anak
+          </button>
+        </div>
+      `;
+      return card;
+    }
+
+    function drawTreeConnections() {
+      const svg = document.getElementById('treeConnectionsSvg');
+      const container = document.getElementById('treeNodesContainer');
+      if (!svg || !container) return;
+
+      const containerRect = container.getBoundingClientRect();
+      let paths = '';
+
+      appState.members.forEach(member => {
+        if (!member) return;
+        const parentCard = document.getElementById(`tree-node-${member.id}`);
+        if (!parentCard) return;
+
+        const parentRect = parentCard.getBoundingClientRect();
+        const startX = (parentRect.left + parentRect.width / 2) - containerRect.left;
+        const startY = (parentRect.bottom) - containerRect.top;
+
+        const childrenIds = Array.isArray(member.anakIds) ? member.anakIds : [];
+        childrenIds.forEach(childId => {
+          const childCard = document.getElementById(`tree-node-${childId}`);
+          if (childCard) {
+            const childRect = childCard.getBoundingClientRect();
+            const endX = (childRect.left + childRect.width / 2) - containerRect.left;
+            const endY = (childRect.top) - containerRect.top;
+            const midY = (startY + endY) / 2;
+            paths += `<path d="M ${startX} ${startY} C ${startX} ${midY}, ${endX} ${midY}, ${endX} ${endY}" class="connector-line" />`;
+          }
+        });
+      });
+
+      svg.innerHTML = paths;
+    }
+
+    function initTreeInteractivity() {
+      const viewport = document.getElementById('treeViewport');
+      const canvas = document.getElementById('treeCanvas');
+      if (!viewport || !canvas) return;
+
+      viewport.addEventListener('mousedown', (e) => {
+        appState.isDraggingTree = true;
+        appState.dragStart = { x: e.clientX - appState.treePan.x, y: e.clientY - appState.treePan.y };
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!appState.isDraggingTree) return;
+        appState.treePan.x = e.clientX - appState.dragStart.x;
+        appState.treePan.y = e.clientY - appState.dragStart.y;
+        updateTreeTransform();
+      });
+
+      window.addEventListener('mouseup', () => { appState.isDraggingTree = false; });
+
+      viewport.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+          appState.isDraggingTree = true;
+          appState.dragStart = { x: e.touches[0].clientX - appState.treePan.x, y: e.touches[0].clientY - appState.treePan.y };
+        }
+      }, { passive: true });
+
+      viewport.addEventListener('touchmove', (e) => {
+        if (!appState.isDraggingTree || e.touches.length !== 1) return;
+        appState.treePan.x = e.touches[0].clientX - appState.dragStart.x;
+        appState.treePan.y = e.touches[0].clientY - appState.dragStart.y;
+        updateTreeTransform();
+      }, { passive: true });
+
+      viewport.addEventListener('touchend', () => { appState.isDraggingTree = false; });
+
+      viewport.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const factor = e.deltaY < 0 ? 1.08 : 0.92;
+        zoomTree(factor);
+      }, { passive: false });
+    }
+
+    function zoomTree(factor) {
+      appState.treeZoom = Math.min(Math.max(appState.treeZoom * factor, 0.4), 2.2);
+      updateTreeTransform();
+    }
+
+    function resetTreeZoom() {
+      appState.treeZoom = 1;
+      appState.treePan = { x: 20, y: 20 };
+      updateTreeTransform();
+    }
+
+    function updateTreeTransform() {
+      const canvas = document.getElementById('treeCanvas');
+      if (canvas) {
+        canvas.style.transform = `translate(${appState.treePan.x}px, ${appState.treePan.y}px) scale(${appState.treeZoom})`;
+      }
+    }
+
+    function filterMemberList() {
+      const q = (document.getElementById('memberFilterSearch').value || '').toLowerCase().trim();
+      const fGen = document.getElementById('filterGenerasi').value;
+      const fGender = document.getElementById('filterGender').value;
+      const fStatus = document.getElementById('filterStatus').value;
+
+      const filtered = appState.members.filter(m => {
+        if (!m) return false;
+        const matchQ = !q || (m.nama || '').toLowerCase().includes(q) || (m.nik || '').includes(q) || (m.pekerjaan || '').toLowerCase().includes(q) || (m.alamat || '').toLowerCase().includes(q);
+        const matchGen = !fGen || (fGen === '4' ? Number(m.generasi) >= 4 : Number(m.generasi) === Number(fGen));
+        const matchGender = !fGender || m.jenisKelamin === fGender;
+        const matchStatus = !fStatus || m.statusHidup === fStatus;
+        return matchQ && matchGen && matchGender && matchStatus;
+      });
+
+      renderMemberGrid(filtered);
+      renderMemberTable(filtered);
+    }
+
+    function handleGlobalSearch(val) {
+      document.getElementById('memberFilterSearch').value = val;
+      if (appState.currentTab !== 'members') {
+        switchTab('members');
+      }
+      filterMemberList();
+    }
+
+    function setMemberViewMode(mode) {
+      appState.currentViewMode = mode;
+      const grid = document.getElementById('membersGridContainer');
+      const table = document.getElementById('membersTableContainer');
+      const btnG = document.getElementById('btnViewGrid');
+      const btnT = document.getElementById('btnViewTable');
+
+      if (mode === 'grid') {
+        grid.classList.remove('hidden');
+        table.classList.add('hidden');
+        btnG.className = 'w-8 h-8 rounded-xl soft-neu-sm text-brand-600 dark:text-brand-400 text-xs flex items-center justify-center transition';
+        btnT.className = 'w-8 h-8 rounded-xl text-slate-400 text-xs flex items-center justify-center transition';
+      } else {
+        grid.classList.add('hidden');
+        table.classList.remove('hidden');
+        btnT.className = 'w-8 h-8 rounded-xl soft-neu-sm text-brand-600 dark:text-brand-400 text-xs flex items-center justify-center transition';
+        btnG.className = 'w-8 h-8 rounded-xl text-slate-400 text-xs flex items-center justify-center transition';
+      }
+    }
+
+    function renderMemberGrid(list) {
+      const container = document.getElementById('membersGridContainer');
+      if (!container) return;
+
+      if (list.length === 0) {
+        container.innerHTML = `<div class="col-span-full p-8 text-center text-slate-400 text-xs font-semibold">Tidak ada anggota keluarga yang sesuai filter.</div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(m => {
+        const spouse = m.idPasangan ? appState.members.find(x => x.id === m.idPasangan) : null;
+        return `
+          <div class="soft-neu rounded-3xl p-4 sm:p-5 flex flex-col justify-between transition-all duration-200 active:scale-[0.99]">
+            <div>
+              <div class="flex items-start justify-between">
+                <div class="w-14 h-14 rounded-2xl ${m.jenisKelamin === 'L' ? 'bg-sky-100 text-sky-600 dark:bg-sky-950' : 'bg-rose-100 text-rose-600 dark:bg-rose-950'} flex items-center justify-center font-black text-sm shrink-0 overflow-hidden soft-neu-inset">
+                  ${m.fotoUrl ? `<img src="${m.fotoUrl}" class="w-full h-full object-cover">` : getInitials(m.nama)}
+                </div>
+                <span class="text-[10px] font-black px-2.5 py-1 rounded-xl ${m.statusHidup === 'Wafat' ? 'bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-400' : 'bg-brand-100 text-brand-700 dark:bg-brand-950/80 dark:text-brand-300'}">
+                  ${m.statusHidup}
+                </span>
+              </div>
+              <h4 class="font-black text-sm text-slate-900 dark:text-slate-100 mt-3 truncate">${m.nama}</h4>
+              <p class="text-[11px] text-slate-400 truncate">${m.pekerjaan || 'Anggota Keluarga'} • Gen ${m.generasi || 1}</p>
+              
+              <div class="mt-3.5 space-y-1.5 text-[11px] text-slate-500">
+                <div class="flex items-center space-x-2 truncate">
+                  <i class="fa-solid fa-cake-candles w-4 text-slate-400 text-center"></i>
+                  <span class="truncate">${m.tempatLahir || '-'}, ${formatDateId(m.tanggalLahir)}</span>
+                </div>
+                <div class="flex items-center space-x-2 truncate">
+                  <i class="fa-solid fa-ring w-4 text-rose-400 text-center"></i>
+                  <span class="truncate">${spouse ? spouse.nama : 'Belum tercatat'}</span>
+                </div>
+                <div class="flex items-center space-x-2 truncate">
+                  <i class="fa-solid fa-location-dot w-4 text-slate-400 text-center"></i>
+                  <span class="truncate">${m.alamat || '-'}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <button onclick="showMemberDetail('${m.id}')" class="text-brand-600 dark:text-brand-400 font-black text-xs hover:underline flex items-center space-x-1">
+                <span>Rincian</span>
+                <i class="fa-solid fa-chevron-right text-[9px]"></i>
+              </button>
+              <div class="flex items-center space-x-1">
+                <button onclick="openEditMemberModal('${m.id}')" title="Ubah Data" class="w-8 h-8 rounded-xl soft-neu-sm flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 active:scale-95 transition">
+                  <i class="fa-solid fa-pen-to-square text-xs"></i>
+                </button>
+                <button onclick="confirmDeleteMember('${m.id}')" title="Hapus" class="w-8 h-8 rounded-xl soft-neu-sm flex items-center justify-center text-rose-400 hover:text-rose-600 active:scale-95 transition">
+                  <i class="fa-solid fa-trash-can text-xs"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderMemberTable(list) {
+      const tbody = document.getElementById('membersTableBody');
+      if (!tbody) return;
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-400 font-semibold">Tidak ada data anggota.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(m => {
+        const spouse = m.idPasangan ? appState.members.find(x => x.id === m.idPasangan) : null;
+        return `
+          <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition">
+            <td class="p-3.5 pl-6 font-bold text-slate-900 dark:text-white flex items-center space-x-2.5">
+              <div class="w-7 h-7 rounded-xl ${m.jenisKelamin === 'L' ? 'bg-sky-100 text-sky-600' : 'bg-pink-100 text-pink-600'} flex items-center justify-center font-bold text-[10px] shrink-0 soft-neu-inset">
+                ${m.fotoUrl ? `<img src="${m.fotoUrl}" class="w-full h-full object-cover rounded-xl">` : getInitials(m.nama)}
+              </div>
+              <span class="truncate max-w-[150px]">${m.nama}</span>
+            </td>
+            <td class="p-3.5 font-bold">G${m.generasi || 1}</td>
+            <td class="p-3.5">${m.jenisKelamin === 'L' ? 'L' : 'P'}</td>
+            <td class="p-3.5 text-slate-500">${formatDateId(m.tanggalLahir)}</td>
+            <td class="p-3.5">
+              <span class="px-2 py-0.5 rounded-lg text-[10px] font-bold ${m.statusHidup === 'Wafat' ? 'bg-slate-200 text-slate-600 dark:bg-slate-800' : 'bg-brand-100 text-brand-700'}">
+                ${m.statusHidup}
+              </span>
+            </td>
+            <td class="p-3.5 text-slate-500 truncate max-w-[120px]">${spouse ? spouse.nama : '-'}</td>
+            <td class="p-3.5 text-slate-500">${m.noHp || '-'}</td>
+            <td class="p-3.5 pr-6 text-right space-x-2">
+              <button onclick="showMemberDetail('${m.id}')" class="text-brand-600 font-bold hover:underline">Detail</button>
+              <button onclick="openEditMemberModal('${m.id}')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-pen"></i></button>
+              <button onclick="confirmDeleteMember('${m.id}')" class="text-rose-400 hover:text-rose-600"><i class="fa-solid fa-trash"></i></button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function showMemberDetail(id) {
+      const m = appState.members.find(x => x.id === id);
+      if (!m) return;
+
+      const father = m.idAyah ? appState.members.find(x => x.id === m.idAyah) : null;
+      const mother = m.idIbu ? appState.members.find(x => x.id === m.idIbu) : null;
+      const spouse = m.idPasangan ? appState.members.find(x => x.id === m.idPasangan) : null;
+      const children = (Array.isArray(m.anakIds) ? m.anakIds : [])
+        .map(cid => appState.members.find(x => x.id === cid))
+        .filter(Boolean);
+
+      const bdayDetail = getParsedBirthdayDetails(m);
+
+      const body = document.getElementById('detailModalBody');
+      body.innerHTML = `
+        <div class="flex items-center space-x-4">
+          <div class="w-20 h-20 rounded-2xl ${m.jenisKelamin === 'L' ? 'bg-sky-100 text-sky-600 dark:bg-sky-950' : 'bg-rose-100 text-rose-600 dark:bg-rose-950'} flex items-center justify-center font-black text-xl shrink-0 overflow-hidden soft-neu-inset">
+            ${m.fotoUrl ? `<img src="${m.fotoUrl}" class="w-full h-full object-cover">` : getInitials(m.nama)}
+          </div>
+          <div>
+            <span class="text-[10px] font-black px-2.5 py-0.5 rounded-lg bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300">Generasi ke-${m.generasi || 1}</span>
+            <h3 class="font-black text-base text-slate-900 dark:text-white mt-1 leading-tight">${m.nama}</h3>
+            <p class="text-xs text-slate-400 mt-0.5">${m.pekerjaan || 'Tidak tercatat'} • ${m.statusHidup}</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5 text-xs pt-1">
+          <div class="p-3 rounded-2xl soft-neu-inset">
+            <span class="text-slate-400 text-[10px] block font-bold">Jenis Kelamin</span>
+            <span class="font-bold text-slate-800 dark:text-slate-200">${m.jenisKelamin === 'L' ? 'Laki-laki' : 'Perempuan'}</span>
+          </div>
+          <div class="p-3 rounded-2xl soft-neu-inset">
+            <span class="text-slate-400 text-[10px] block font-bold">Kelahiran & Usia</span>
+            <span class="font-bold text-slate-800 dark:text-slate-200">${m.tempatLahir || '-'}, ${formatDateId(m.tanggalLahir)}</span>
+            ${bdayDetail ? `<span class="text-[10px] text-pink-600 dark:text-pink-400 block font-bold mt-0.5">(${bdayDetail.turningAge} Tahun)</span>` : ''}
+          </div>
+          ${m.statusHidup === 'Wafat' ? `
+            <div class="p-3 rounded-2xl soft-neu-inset col-span-2">
+              <span class="text-slate-400 text-[10px] block font-bold">Tanggal Wafat</span>
+              <span class="font-bold text-rose-500">${formatDateId(m.tanggalWafat)}</span>
+            </div>
+          ` : ''}
+          <div class="p-3 rounded-2xl soft-neu-inset">
+            <span class="text-slate-400 text-[10px] block font-bold">No. WhatsApp</span>
+            <span class="font-bold text-slate-800 dark:text-slate-200">${m.noHp || '-'}</span>
+          </div>
+          <div class="p-3 rounded-2xl soft-neu-inset">
+            <span class="text-slate-400 text-[10px] block font-bold">NIK</span>
+            <span class="font-bold text-slate-800 dark:text-slate-200">${m.nik || '-'}</span>
+          </div>
+        </div>
+
+        <div class="border-t border-slate-100 dark:border-slate-800 pt-3 space-y-2">
+          <h4 class="text-xs font-black animated-menu-text uppercase tracking-wider">Garis Keturunan</h4>
+          <div class="space-y-1.5 text-xs">
+            <div class="flex justify-between p-2.5 rounded-xl soft-neu-inset">
+              <span class="text-slate-400 font-semibold">Ayah Kandung:</span>
+              <span class="font-bold cursor-pointer text-brand-600" onclick="${father ? `showMemberDetail('${father.id}')` : ''}">${father ? father.nama : '-'}</span>
+            </div>
+            <div class="flex justify-between p-2.5 rounded-xl soft-neu-inset">
+              <span class="text-slate-400 font-semibold">Ibu Kandung:</span>
+              <span class="font-bold cursor-pointer text-brand-600" onclick="${mother ? `showMemberDetail('${mother.id}')` : ''}">${mother ? mother.nama : '-'}</span>
+            </div>
+            <div class="flex justify-between p-2.5 rounded-xl soft-neu-inset">
+              <span class="text-slate-400 font-semibold">Pasangan:</span>
+              <span class="font-bold cursor-pointer text-rose-500" onclick="${spouse ? `showMemberDetail('${spouse.id}')` : ''}">${spouse ? spouse.nama : 'Belum Ada'}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="border-t border-slate-100 dark:border-slate-800 pt-3">
+          <h4 class="text-xs font-black animated-menu-text uppercase tracking-wider mb-2">Anak (${children.length})</h4>
+          <div class="flex flex-wrap gap-2">
+            ${children.length > 0 ? children.map(c => `
+              <span onclick="showMemberDetail('${c.id}')" class="px-3 py-1.5 rounded-xl soft-neu-sm text-brand-700 dark:text-brand-300 font-bold text-xs cursor-pointer hover:underline">
+                ${c.nama} (${c.jenisKelamin})
+              </span>
+            `).join('') : '<span class="text-xs text-slate-400 italic">Belum ada anak terdaftar.</span>'}
+          </div>
+        </div>
+
+        ${m.alamat ? `
+          <div class="border-t border-slate-100 dark:border-slate-800 pt-3">
+            <span class="text-slate-400 text-[10px] block font-bold">Domisili</span>
+            <p class="text-xs text-slate-700 dark:text-slate-300 mt-0.5">${m.alamat}</p>
+          </div>
+        ` : ''}
+
+        ${m.keterangan ? `
+          <div class="border-t border-slate-100 dark:border-slate-800 pt-3">
+            <span class="text-slate-400 text-[10px] block font-bold">Catatan Khusus</span>
+            <p class="text-xs text-slate-700 dark:text-slate-300 mt-0.5">${m.keterangan}</p>
+          </div>
+        ` : ''}
+      `;
+
+      const footer = document.getElementById('detailModalFooter');
+      const waUrl = (m.statusHidup !== 'Wafat' && bdayDetail) ? generateWhatsAppWishUrl(m, bdayDetail.turningAge) : null;
+
+      footer.innerHTML = `
+        <button onclick="closeModal('detailModal')" class="px-4 py-2.5 rounded-xl text-slate-500 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800">Tutup</button>
+        ${waUrl && m.noHp && m.noHp !== '-' ? `
+          <a href="${waUrl}" target="_blank" class="px-4 py-2.5 rounded-xl bg-brand-500 text-white text-xs font-black flex items-center space-x-1.5 hover:bg-brand-600 transition">
+            <i class="fa-brands fa-whatsapp text-sm"></i>
+            <span>Ucapan WA</span>
+          </a>
+        ` : ''}
+        <button onclick="closeModal('detailModal'); openEditMemberModal('${m.id}')" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-cyan-500 text-white text-xs font-black hover:from-brand-700 hover:to-cyan-600 active:scale-95 shadow-md shadow-brand-600/20">Ubah Data</button>
+      `;
+
+      openModal('detailModal');
+    }
+
+    function populateFormMemberOptions(excludeId = null) {
+      const fAyah = document.getElementById('formIdAyah');
+      const fIbu = document.getElementById('formIdIbu');
+      const fPasangan = document.getElementById('formIdPasangan');
+
+      fAyah.innerHTML = '<option value="">-- Tidak Diketahui / Sesepuh --</option>';
+      fIbu.innerHTML = '<option value="">-- Tidak Diketahui / Sesepuh --</option>';
+      fPasangan.innerHTML = '<option value="">-- Belum / Tidak Ada --</option>';
+
+      appState.members.forEach(m => {
+        if (!m || (excludeId && m.id === excludeId)) return;
+
+        const opt = document.createElement('option');
+        opt.value = m.id;
+        opt.textContent = `${m.nama} (G${m.generasi || 1})`;
+
+        if (m.jenisKelamin === 'L') {
+          fAyah.appendChild(opt.cloneNode(true));
+        } else {
+          fIbu.appendChild(opt.cloneNode(true));
+        }
+        fPasangan.appendChild(opt);
+      });
+    }
+
+    function openMemberModal() {
+      document.getElementById('memberForm').reset();
+      document.getElementById('formMemberId').value = '';
+      document.getElementById('formFotoBase64').value = '';
+      document.getElementById('formFotoUrlExisting').value = '';
+      document.getElementById('formFotoDriveIdExisting').value = '';
+      document.getElementById('formFotoPreview').classList.add('hidden');
+      document.getElementById('formFotoPlaceholderIcon').classList.remove('hidden');
+      document.getElementById('memberModalTitle').innerHTML = '<i class="fa-solid fa-user-plus text-brand-600"></i><span class="animated-menu-text">Tambah Anggota Keluarga</span>';
+      
+      toggleWafatInput('Hidup');
+      populateFormMemberOptions();
+      openModal('memberModal');
+    }
+
+    function openEditMemberModal(id) {
+      const m = appState.members.find(x => x.id === id);
+      if (!m) return;
+
+      populateFormMemberOptions(m.id);
+
+      document.getElementById('formMemberId').value = m.id;
+      document.getElementById('formNama').value = m.nama || '';
+      document.getElementById('formNik').value = m.nik || '';
+      document.getElementById('formJenisKelamin').value = m.jenisKelamin || 'L';
+      document.getElementById('formTempatLahir').value = m.tempatLahir || '';
+      document.getElementById('formTanggalLahir').value = m.tanggalLahir || '';
+      document.getElementById('formStatusHidup').value = m.statusHidup || 'Hidup';
+      document.getElementById('formTanggalWafat').value = m.tanggalWafat || '';
+      document.getElementById('formIdAyah').value = m.idAyah || '';
+      document.getElementById('formIdIbu').value = m.idIbu || '';
+      document.getElementById('formIdPasangan').value = m.idPasangan || '';
+      document.getElementById('formGenerasi').value = m.generasi || 1;
+      document.getElementById('formNoHp').value = m.noHp || '';
+      document.getElementById('formPekerjaan').value = m.pekerjaan || '';
+      document.getElementById('formAlamat').value = m.alamat || '';
+      document.getElementById('formKeterangan').value = m.keterangan || '';
+      
+      document.getElementById('formFotoBase64').value = '';
+      document.getElementById('formFotoUrlExisting').value = m.fotoUrl || '';
+      document.getElementById('formFotoDriveIdExisting').value = m.fotoDriveId || '';
+
+      const preview = document.getElementById('formFotoPreview');
+      const icon = document.getElementById('formFotoPlaceholderIcon');
+      if (m.fotoUrl) {
+        preview.src = m.fotoUrl;
+        preview.classList.remove('hidden');
+        icon.classList.add('hidden');
+      } else {
+        preview.classList.add('hidden');
+        icon.classList.remove('hidden');
+      }
+
+      toggleWafatInput(m.statusHidup || 'Hidup');
+      document.getElementById('memberModalTitle').innerHTML = '<i class="fa-solid fa-user-pen text-brand-600"></i><span class="animated-menu-text">Ubah Data Anggota</span>';
+      openModal('memberModal');
+    }
+
+    function openAddChildModal(parentId) {
+      openMemberModal();
+      const parent = appState.members.find(x => x.id === parentId);
+      if (parent) {
+        if (parent.jenisKelamin === 'L') {
+          document.getElementById('formIdAyah').value = parent.id;
+          if (parent.idPasangan) document.getElementById('formIdIbu').value = parent.idPasangan;
+        } else {
+          document.getElementById('formIdIbu').value = parent.id;
+          if (parent.idPasangan) document.getElementById('formIdAyah').value = parent.idPasangan;
+        }
+        document.getElementById('formGenerasi').value = (Number(parent.generasi) || 1) + 1;
+      }
+    }
+
+    function toggleWafatInput(val) {
+      const container = document.getElementById('wafatInputContainer');
+      if (val === 'Wafat') {
+        container.classList.remove('hidden');
+      } else {
+        container.classList.add('hidden');
+        document.getElementById('formTanggalWafat').value = '';
+      }
+    }
+
+    function calculateSuggestedGeneration() {
+      const ayahId = document.getElementById('formIdAyah').value;
+      const ibuId = document.getElementById('formIdIbu').value;
+      let parentGen = 0;
+
+      if (ayahId) {
+        const a = appState.members.find(x => x.id === ayahId);
+        if (a) parentGen = Math.max(parentGen, Number(a.generasi) || 1);
+      }
+      if (ibuId) {
+        const i = appState.members.find(x => x.id === ibuId);
+        if (i) parentGen = Math.max(parentGen, Number(i.generasi) || 1);
+      }
+
+      if (parentGen > 0) {
+        document.getElementById('formGenerasi').value = parentGen + 1;
+      }
+    }
+
+    function previewImageFile(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        const img = new Image();
+        img.onload = () => {
+          // Downsample image to maximum 800px width/height for optimized upload
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const maxDim = 800;
+
+          if (width > height && width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.82);
+          document.getElementById('formFotoBase64').value = compressedBase64;
+          const preview = document.getElementById('formFotoPreview');
+          preview.src = compressedBase64;
+          preview.classList.remove('hidden');
+          document.getElementById('formFotoPlaceholderIcon').classList.add('hidden');
+        };
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleSaveMember(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSubmitMember');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i><span>Menyimpan ke Sheets...</span>';
+
+      const memberId = document.getElementById('formMemberId').value;
+      const base64Foto = document.getElementById('formFotoBase64').value;
+      const existingUrl = document.getElementById('formFotoUrlExisting').value;
+      const existingDriveId = document.getElementById('formFotoDriveIdExisting').value;
+
+      const memberPayload = {
+        id: memberId,
+        nama: document.getElementById('formNama').value.trim(),
+        nik: document.getElementById('formNik').value.trim(),
+        jenisKelamin: document.getElementById('formJenisKelamin').value,
+        tempatLahir: document.getElementById('formTempatLahir').value.trim(),
+        tanggalLahir: document.getElementById('formTanggalLahir').value,
+        statusHidup: document.getElementById('formStatusHidup').value,
+        tanggalWafat: document.getElementById('formTanggalWafat').value,
+        idAyah: document.getElementById('formIdAyah').value,
+        idIbu: document.getElementById('formIdIbu').value,
+        idPasangan: document.getElementById('formIdPasangan').value,
+        generasi: Number(document.getElementById('formGenerasi').value) || 1,
+        noHp: document.getElementById('formNoHp').value.trim(),
+        pekerjaan: document.getElementById('formPekerjaan').value.trim(),
+        alamat: document.getElementById('formAlamat').value.trim(),
+        keterangan: document.getElementById('formKeterangan').value.trim(),
+        fotoUrl: existingUrl,
+        fotoDriveId: existingDriveId
+      };
+
+      if (base64Foto && isGoogleAppsScript) {
+        google.script.run
+          .withSuccessHandler(uploadRes => {
+            if (uploadRes && uploadRes.success) {
+              memberPayload.fotoUrl = uploadRes.url;
+              memberPayload.fotoDriveId = uploadRes.fileId;
+            }
+            saveMemberRecord(memberPayload, btn);
+          })
+          .withFailureHandler(err => {
+            showToast('Gagal unggah foto ke Drive: ' + err.toString(), 'error');
+            saveMemberRecord(memberPayload, btn);
+          })
+          .uploadMediaToDrive({
+            base64Data: base64Foto,
+            fileName: 'foto_' + (memberPayload.nama).replace(/\s+/g, '_') + '.jpg',
+            mimeType: 'image/jpeg',
+            memberId: memberPayload.id,
+            type: 'foto'
+          });
+      } else {
+        if (base64Foto && !isGoogleAppsScript) {
+          memberPayload.fotoUrl = base64Foto;
+        }
+        saveMemberRecord(memberPayload, btn);
+      }
+    }
+
+    function saveMemberRecord(payload, btn) {
+      if (isGoogleAppsScript) {
+        google.script.run
+          .withSuccessHandler(res => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i><span>Simpan Anggota</span>';
+            if (res && res.success) {
+              showToast(res.message, 'success');
+              closeModal('memberModal');
+              reloadAllData();
+            } else {
+              showToast(res.message || 'Gagal menyimpan', 'error');
+            }
+          })
+          .withFailureHandler(err => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i><span>Simpan Anggota</span>';
+            showToast('Gagal komunikasi dengan server: ' + err.toString(), 'error');
+          })
+          .saveMember(payload, appState.currentUser.nama);
+      } else {
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i><span>Simpan Anggota</span>';
+          if (!payload.id) {
+            payload.id = 'MEM-' + Date.now().toString().slice(-6);
+            appState.members.push(payload);
+          } else {
+            const idx = appState.members.findIndex(x => x.id === payload.id);
+            if (idx !== -1) appState.members[idx] = { ...appState.members[idx], ...payload };
+          }
+          showToast('Data berhasil disimpan secara lokal!', 'success');
+          closeModal('memberModal');
+          renderAllViews();
+        }, 400);
+      }
+    }
+
+    function confirmDeleteMember(id) {
+      const m = appState.members.find(x => x.id === id);
+      if (!m) return;
+
+      const confirmed = window.prompt(`Ketik "HAPUS" untuk konfirmasi penghapusan data ${m.nama}:`);
+      if (confirmed !== 'HAPUS') {
+        if (confirmed !== null) showToast('Penghapusan dibatalkan.', 'info');
+        return;
+      }
+
+      if (isGoogleAppsScript) {
+        google.script.run
+          .withSuccessHandler(res => {
+            if (res && res.success) {
+              showToast(res.message, 'success');
+              reloadAllData();
+            } else {
+              showToast(res.message, 'error');
+            }
+          })
+          .withFailureHandler(err => {
+            showToast('Gagal menghapus: ' + err.toString(), 'error');
+          })
+          .deleteMember(id, appState.currentUser.nama);
+      } else {
+        appState.members = appState.members.filter(x => x.id !== id);
+        showToast(`Data ${m.nama} berhasil dihapus!`, 'success');
+        renderAllViews();
+      }
+    }
+
+    function renderReportView() {
+      const container = document.getElementById('reportGenerationsContainer');
+      const dateEl = document.getElementById('reportPrintDate');
+      if (dateEl) dateEl.textContent = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+      document.getElementById('reportFamilyTitle').textContent = 'BUKU SILSILAH ' + (appState.config.namaKeluarga || 'KELUARGA BESAR').toUpperCase();
+      document.getElementById('reportMottoTitle').textContent = `"${appState.config.motto || 'Guyub Rukun Mbangun Katentreman'}"`;
+
+      if (!container) return;
+
+      const genMap = {};
+      appState.members.forEach(m => {
+        if (!m) return;
+        const g = Number(m.generasi) || 1;
+        if (!genMap[g]) genMap[g] = [];
+        genMap[g].push(m);
+      });
+
+      const gens = Object.keys(genMap).map(Number).sort((a, b) => a - b);
+      if (gens.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-400 italic">Belum ada data anggota untuk laporan.</p>`;
+        return;
+      }
+
+      container.innerHTML = gens.map(g => `
+        <div class="border-b border-slate-200 dark:border-slate-800 pb-5 break-inside-avoid">
+          <div class="flex items-center space-x-3 mb-3">
+            <span class="w-7 h-7 rounded-xl bg-gradient-to-r from-brand-600 to-cyan-500 text-white flex items-center justify-center font-black text-xs shadow-sm">${g}</span>
+            <h3 class="text-sm sm:text-base font-black uppercase tracking-wider animated-menu-text">Generasi Ke-${g}</h3>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            ${genMap[g].map(m => {
+              const spouse = m.idPasangan ? appState.members.find(x => x.id === m.idPasangan) : null;
+              return `
+                <div class="p-3 rounded-2xl soft-neu-sm space-y-1">
+                  <div class="flex justify-between items-start">
+                    <span class="font-black text-slate-900 dark:text-white">${m.nama} (${m.jenisKelamin})</span>
+                    <span class="text-[10px] font-bold ${m.statusHidup === 'Wafat' ? 'text-slate-400' : 'text-brand-600'}">${m.statusHidup}</span>
+                  </div>
+                  <p class="text-[11px] text-slate-500">Lahir: ${m.tempatLahir || '-'}, ${formatDateId(m.tanggalLahir)}</p>
+                  <p class="text-[11px] text-slate-500">Pasangan: ${spouse ? spouse.nama : 'Belum tercatat'}</p>
+                  <p class="text-[11px] text-slate-500">Alamat: ${m.alamat || '-'}</p>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function prepareAndPrintReport() {
+      renderReportView();
+      setTimeout(() => {
+        window.print();
+      }, 150);
+    }
+
+    function triggerDriveBackup() {
+      const btn = document.getElementById('btnDriveBackup');
+      const alertBox = document.getElementById('backupResultAlert');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i><span>Menyimpan ke Google Drive...</span>';
+
+      if (isGoogleAppsScript) {
+        google.script.run
+          .withSuccessHandler(res => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i><span>Cadangkan Sekarang ke Drive</span>';
+            alertBox.classList.remove('hidden');
+            if (res && res.success) {
+              alertBox.className = 'p-3.5 rounded-2xl text-xs bg-sky-50 text-sky-800 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-200';
+              alertBox.innerHTML = `✅ <b>Berhasil!</b> ${res.message}<br><a href="${res.fileUrl}" target="_blank" class="underline font-bold mt-1 inline-block">Buka File di Drive: ${res.fileName}</a>`;
+              showToast('Cadangan berhasil disimpan ke Google Drive!', 'success');
+            } else {
+              alertBox.className = 'p-3.5 rounded-2xl text-xs bg-rose-50 text-rose-800 border border-rose-200';
+              alertBox.textContent = '❌ ' + (res.message || 'Gagal');
+            }
+          })
+          .withFailureHandler(err => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i><span>Cadangkan Sekarang ke Drive</span>';
+            showToast('Gagal menghubungi Google Drive: ' + err.toString(), 'error');
+          })
+          .backupDatabaseToDrive(appState.currentUser.nama);
+      }
+    }
+
+    function downloadJsonBackup() {
+      const payload = {
+        app: 'Silsilah Keluarga Digital',
+        version: '3.6.0',
+        keluarga: appState.config.namaKeluarga,
+        timestamp: new Date().toISOString(),
+        config: appState.config,
+        members: appState.members
+      };
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `Cadangan_${(appState.config.namaKeluarga || 'Keluarga').replace(/\s+/g, '_')}_${Date.now()}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast('File JSON cadangan berhasil diunduh!', 'success');
+    }
+
+    function triggerRestoreFromFile() {
+      const fileInput = document.getElementById('restoreFileInput');
+      const file = fileInput.files[0];
+      if (!file) {
+        showToast('Pilih berkas JSON cadangan terlebih dahulu!', 'info');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target.result;
+        if (isGoogleAppsScript) {
+          google.script.run
+            .withSuccessHandler(res => {
+              if (res && res.success) {
+                showToast(res.message, 'success');
+                reloadAllData();
+              } else {
+                showToast(res.message || 'Gagal memulihkan', 'error');
+              }
+            })
+            .withFailureHandler(err => {
+              showToast('Kesalahan pemulihan: ' + err.toString(), 'error');
+            })
+            .restoreDatabase(content, appState.currentUser.nama);
+        } else {
+          try {
+            const parsed = JSON.parse(content);
+            if (parsed.members) {
+              appState.members = parsed.members;
+              if (parsed.config) appState.config = parsed.config;
+              renderAllViews();
+              showToast('Data berhasil dipulihkan secara lokal!', 'success');
+            }
+          } catch (err) {
+            showToast('Format berkas JSON tidak valid!', 'error');
+          }
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function handleSaveSettings(e) {
+      e.preventDefault();
+      const updated = {
+        namaKeluarga: document.getElementById('settingNamaKeluarga').value.trim(),
+        motto: document.getElementById('settingMotto').value.trim(),
+        deskripsi: document.getElementById('settingDeskripsi').value.trim()
+      };
+      const pin = document.getElementById('settingAdminPin').value.trim();
+      if (pin) updated.adminPin = pin;
+
+      if (isGoogleAppsScript) {
+        google.script.run
+          .withSuccessHandler(res => {
+            if (res && res.success) {
+              showToast(res.message, 'success');
+              reloadAllData();
+            } else {
+              showToast(res.message, 'error');
+            }
+          })
+          .saveFamilyProfile(updated, appState.currentUser.nama);
+      } else {
+        appState.config = { ...appState.config, ...updated };
+        renderAllViews();
+        showToast('Pengaturan berhasil disimpan!', 'success');
+      }
+    }
+
+    function handleAuthAction() {
+      openModal('authModal');
+    }
+
+    function handleAuthLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById('authInputUser').value.trim();
+      const p = document.getElementById('authInputPin').value.trim();
+      const errBox = document.getElementById('authErrorMsg');
+
+      if (isGoogleAppsScript) {
+        google.script.run
+          .withSuccessHandler(res => {
+            if (res && res.success) {
+              appState.currentUser = res.user;
+              updateUserSessionUi();
+              closeModal('authModal');
+              showToast('Selamat datang, ' + res.user.nama + '!', 'success');
+            } else {
+              errBox.textContent = res.message || 'Login gagal';
+              errBox.classList.remove('hidden');
+            }
+          })
+          .verifyUserLogin(u, p);
+      } else {
+        if (p === '123456') {
+          appState.currentUser = {
+            username: u,
+            nama: u === 'admin' ? 'Administrator Utama' : 'Pengurus Trah',
+            role: 'admin'
+          };
+          updateUserSessionUi();
+          closeModal('authModal');
+          showToast('Login berhasil sebagai ' + appState.currentUser.nama, 'success');
+        } else {
+          errBox.textContent = 'PIN salah. Gunakan 123456';
+          errBox.classList.remove('hidden');
+        }
+      }
+    }
+
+    function updateUserSessionUi() {
+      document.getElementById('desktopUserName').textContent = appState.currentUser.nama;
+      document.getElementById('desktopUserRole').textContent = appState.currentUser.role === 'admin' ? 'Akses Administrator' : 'Akses Anggota';
+      document.getElementById('desktopUserAvatar').textContent = getInitials(appState.currentUser.nama);
+    }
+
+    function handleBackdropClick(e, modalId) {
+      if (e.target && e.target.id === modalId) {
+        closeModal(modalId);
+      }
+    }
+
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.remove('hidden');
+      }
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) {
+        modal.style.display = 'none';
+        modal.classList.add('hidden');
+      }
+    }
+
+    function getInitials(name) {
+      if (!name) return 'AK';
+      const parts = name.replace(/[^a-zA-Z\s]/g, '').trim().split(/\s+/);
+      if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+
+    function formatDateId(dateStr) {
+      if (!dateStr) return '-';
+      try {
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return dateStr;
+        return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+      } catch (e) {
+        return dateStr;
+      }
+    }
+
+    function showToast(msg, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      const colors = {
+        success: 'bg-sky-600 text-white',
+        error: 'bg-rose-600 text-white',
+        info: 'bg-slate-800 text-white'
+      };
+
+      toast.className = `px-4 py-3 rounded-2xl shadow-2xl text-xs font-black flex items-center space-x-2.5 transition-all transform duration-200 translate-y-2 opacity-0 pointer-events-auto ${colors[type] || colors.info}`;
+      toast.innerHTML = `
+        <i class="fa-solid ${type === 'success' ? 'fa-circle-check' : (type === 'error' ? 'fa-triangle-exclamation' : 'fa-circle-info')}"></i>
+        <span>${msg}</span>
+      `;
+
+      container.appendChild(toast);
+      requestAnimationFrame(() => { toast.classList.remove('translate-y-2', 'opacity-0'); });
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 250);
+      }, 3200);
+    }
+  </script>
+</body>
+</html>
